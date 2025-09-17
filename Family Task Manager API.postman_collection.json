@@ -1,0 +1,780 @@
+{
+  "info": {
+    "name": "Family Task Manager API",
+    "description": "API para gerenciamento de tarefas familiares com Clean Architecture, DDD e CQRS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Rota Principal",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Usuários (Users)",
+      "item": [
+        {
+          "name": "Registrar Usuário - João Silva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fullName\": \"João Silva\",\n    \"email\": \"joao.silva@email.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Usuário - Maria Santos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fullName\": \"Maria Santos\",\n    \"email\": \"maria.santos@email.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Usuário - Pedro Oliveira",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fullName\": \"Pedro Oliveira Santos Silva\",\n    \"email\": \"pedro.oliveira@email.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login - João Silva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao.silva@email.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Maria Santos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.santos@email.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Pedro Oliveira",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pedro.oliveira@email.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Famílias (Families)",
+      "item": [
+        {
+          "name": "Criar Família - Silva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Família Silva\",\n  \"role\": \"FATHER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/families",
+              "host": ["{{baseUrl}}"],
+              "path": ["families"]
+            }
+          }
+        },
+        {
+          "name": "Criar Família - Santos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Família Santos\",\n  \"role\": \"MOTHER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/families",
+              "host": ["{{baseUrl}}"],
+              "path": ["families"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Família por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/families/:familyId",
+              "host": ["{{baseUrl}}"],
+              "path": ["families", ":familyId"],
+              "variable": [
+                {
+                  "key": "familyId"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar Famílias por Usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/families/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["families", "user", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "digite-o-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Adicionar Membro à Família - Mãe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"familyId\": \"digite-o-id\",\n  \"userId\": \"digite-o-id\",\n  \"role\": \"MOTHER\",\n  \"responsibility\": \"MEMBER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/families/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["families", "members"]
+            }
+          }
+        },
+        {
+          "name": "Adicionar Membro à Família - Filho",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"familyId\": \"digite-o-id\",\n  \"userId\": \"digite-o-id\",\n  \"role\": \"SON\",\n  \"responsibility\": \"MEMBER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/families/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["families", "members"]
+            }
+          }
+        },
+        {
+          "name": "Alterar Cargo do Membro",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"familyId\": \"digite-o-id\",\n  \"userId\": \"digite-o-id\",\n  \"newRole\": \"MOTHER\",\n  \"newResponsibility\": \"AUXILIARY_RESPONSIBLE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/families/members/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["families", "members", "role"]
+            }
+          }
+        },
+        {
+          "name": "Remover Membro da Família",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/families/:familyId/members/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["families", ":familyId", "members", ":userId"],
+              "variable": [
+                {
+                  "key": "familyId"
+                },
+                {
+                  "key": "userId"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Tarefas (Tasks)",
+      "item": [
+        {
+          "name": "Criar Tarefa - Limpar Casa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Limpar a casa\",\n  \"description\": \"Fazer a limpeza completa da casa incluindo quartos, sala, cozinha e banheiros\",\n  \"familyId\": \"digite-o-id\",\n  \"assignedTo\": [\"digite-o-id\"],\n  \"dueDate\": \"2024-12-31T23:59:59.000Z\",\n  \"location\": \"Casa\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"]
+            }
+          }
+        },
+        {
+          "name": "Criar Tarefa - Fazer Compras",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fazer compras no supermercado\",\n  \"description\": \"Comprar ingredientes para o jantar de Natal: peru, batatas, legumes e sobremesa\",\n  \"familyId\": \"digite-o-id\",\n  \"assignedTo\": [\"digite-o-id\", \"digite-o-id\"],\n  \"dueDate\": \"2024-12-24T18:00:00.000Z\",\n  \"location\": \"Supermercado Extra\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"]
+            }
+          }
+        },
+        {
+          "name": "Criar Tarefa - Organizar Armário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Organizar armário\",\n  \"description\": \"Separar roupas por estação, doar o que não serve mais e organizar por categoria\",\n  \"familyId\": \"digite-o-id\",\n  \"assignedTo\": [\"digite-o-id\"],\n  \"location\": \"Quarto principal\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Tarefa por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:taskId",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":taskId"],
+              "variable": [
+                {
+                  "key": "taskId"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar Tarefas por Família",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/family/:familyId",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "family", ":familyId"],
+              "variable": [
+                {
+                  "key": "familyId",
+                  "value": "digite-o-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar Tarefas por Usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "user", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "digite-o-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Tarefa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Limpar a casa - Atualizado\",\n  \"description\": \"Fazer a limpeza completa da casa incluindo quartos, sala, cozinha, banheiros e área externa\",\n  \"dueDate\": \"2024-12-30T23:59:59.000Z\",\n  \"location\": \"Casa - Todas as dependências\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:taskId",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":taskId"],
+              "variable": [
+                {
+                  "key": "taskId"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Alterar Status - Em Progresso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:taskId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":taskId", "status"],
+              "variable": [
+                {
+                  "key": "taskId",
+                  "value": "digite-o-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Alterar Status - Concluída",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:taskId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":taskId", "status"],
+              "variable": [
+                {
+                  "key": "taskId"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Alterar Status - Cancelada",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CANCELLED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:taskId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":taskId", "status"],
+              "variable": [
+                {
+                  "key": "taskId"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Adicionar Atribuição à Tarefa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"digite-o-id\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:taskId/assignments",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":taskId", "assignments"],
+              "variable": [
+                {
+                  "key": "taskId",
+                  "value": "digite-o-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remover Atribuição da Tarefa",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:taskId/assignments/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":taskId", "assignments", ":userId"],
+              "variable": [
+                {
+                  "key": "taskId"
+                },
+                {
+                  "key": "userId"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ]
+}
