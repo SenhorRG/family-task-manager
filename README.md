@@ -87,7 +87,7 @@ src/
 │ ├── application/
 │ ├── infrastructure/
 │ └── presentation/
-└── tasks/              # Bounded Context: Tarefas (a estrutura é a mesmo que a do Users mas para a Tarefa)
+└── tasks/              # Bounded Context: Tarefas (a estrutura é a mesmo que a do Usuários mas para a Tarefa)
   ├── domain/
   ├── application/
   ├── infrastructure/
