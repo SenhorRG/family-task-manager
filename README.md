@@ -88,10 +88,10 @@ src/
 │ ├── infrastructure/
 │ └── presentation/
 └── tasks/              # Bounded Context: Tarefas (a estrutura é a mesmo que a do Users mas para a Tarefa)
-├── domain/
-├── application/
-├── infrastructure/
-└── presentation/
+  ├── domain/
+  ├── application/
+  ├── infrastructure/
+  └── presentation/
 ```
 
 Eu implementei como exemplo o uso de três bancos de dados (um otimizado para escrita, outro para leitura e um para os eventos), ambos usam o MongoDB local, e para autenticação implementei o JWT. Na raiz dos arquivos do projeto deixei um arquivo JSON para importar a estrutura completa dos endpoints para o Postman já com alguns dados para teste.
