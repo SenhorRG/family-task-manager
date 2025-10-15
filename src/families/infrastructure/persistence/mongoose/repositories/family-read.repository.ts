@@ -24,7 +24,7 @@ export class MongoFamilyReadRepository implements FamilyReadRepository {
 
     const enrichedMembers = familyDoc.members.map((member) => ({
       userId: member.userId,
-      memberName: usersInfo.get(member.userId)?.fullName || 'Usuário não encontrado',
+      memberName: usersInfo.get(member.userId)?.fullName || 'User not found',
       role: member.role,
       responsibility: member.responsibility,
       joinedAt: member.joinedAt,

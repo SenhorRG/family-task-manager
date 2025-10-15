@@ -23,7 +23,7 @@ export class AddMemberHandler implements ICommandHandler<AddMemberCommand> {
 
     const family = await this.familyRepository.findById(familyIdVO);
     if (!family) {
-      throw new NotFoundException('Família não encontrada');
+      throw new NotFoundException('Family not found');
     }
 
     family.addMember(userIdVO, roleVO, responsibilityVO, addedByVO);

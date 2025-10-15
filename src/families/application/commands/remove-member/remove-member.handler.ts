@@ -21,7 +21,7 @@ export class RemoveMemberHandler implements ICommandHandler<RemoveMemberCommand>
 
     const family = await this.familyRepository.findById(familyIdVO);
     if (!family) {
-      throw new NotFoundException('Família não encontrada');
+      throw new NotFoundException('Family not found');
     }
 
     family.removeMember(userIdVO, removedByVO);

@@ -17,7 +17,7 @@ export class GetFamilyByIdHandler implements IQueryHandler<GetFamilyByIdQuery> {
 
     const family = await this.familyReadRepository.findById(familyIdVO);
     if (!family) {
-      throw new NotFoundException('Família não encontrada');
+      throw new NotFoundException('Family not found');
     }
 
     return family;

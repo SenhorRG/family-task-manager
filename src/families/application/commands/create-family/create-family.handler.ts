@@ -20,7 +20,7 @@ export class CreateFamilyHandler implements ICommandHandler<CreateFamilyCommand>
 
     const existingFamily = await this.familyRepository.findByPrincipalResponsible(principalUserId);
     if (existingFamily) {
-      throw new ConflictException('Usuário já é responsável principal de uma família');
+      throw new ConflictException('The user is already principal responsible of a family');
     }
 
     const family = this.familyFactory.createFamily(name, principalResponsibleUserId, principalRole);
