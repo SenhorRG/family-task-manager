@@ -19,8 +19,9 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}",
-              "host": ["{{baseUrl}}"]
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
             }
           }
         }

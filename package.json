@@ -20,7 +20,17 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:seed": "node dist/scripts/seed.js",
-    "db:migrate": "node dist/scripts/migrate.js"
+    "db:migrate": "node dist/scripts/migrate.js",
+    "docker:build": "docker build -t family-task-manager .",
+    "docker:build:dev": "docker build -f Dockerfile.dev -t family-task-manager:dev .",
+    "docker:up": "docker-compose up -d",
+    "docker:up:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:down": "docker-compose down",
+    "docker:down:dev": "docker-compose -f docker-compose.dev.yml down",
+    "docker:logs": "docker-compose logs -f app",
+    "docker:logs:dev": "docker-compose -f docker-compose.dev.yml logs -f app",
+    "docker:restart": "docker-compose restart app",
+    "docker:restart:dev": "docker-compose -f docker-compose.dev.yml restart app"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

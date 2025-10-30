@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # MongoDB para dados principais (Write)
+  mongodb-write:
+    image: mongo:7.0
+    container_name: family-task-manager-mongodb-write-dev
+    environment:
+      MONGO_INITDB_DATABASE: family-task-manager-write-dev
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_write_dev_data:/data/db
+
+  # MongoDB para leitura (Read)
+  mongodb-read:
+    image: mongo:7.0
+    container_name: family-task-manager-mongodb-read-dev
+    environment:
+      MONGO_INITDB_DATABASE: family-task-manager-read-dev
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_read_dev_data:/data/db
+
+  # MongoDB para eventos (Events)
+  mongodb-events:
+    image: mongo:7.0
+    container_name: family-task-manager-mongodb-events-dev
+    environment:
+      MONGO_INITDB_DATABASE: family-task-manager-events-dev
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongodb_events_dev_data:/data/db
+
+  # Aplicação NestJS para desenvolvimento
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: family-task-manager-app-dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGODB_WRITE_URI: mongodb://mongodb-write:27017/family-task-manager-write-dev
+      MONGODB_READ_URI: mongodb://mongodb-read:27017/family-task-manager-read-dev
+      MONGODB_EVENTS_URI: mongodb://mongodb-events:27017/family-task-manager-events-dev
+      JWT_SECRET: a3ea83e20137ce737ed3675302f63858a0c0cce7
+      JWT_EXPIRES_IN: 24h
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb-write
+      - mongodb-read
+      - mongodb-events
+    
+
+volumes:
+  mongodb_write_dev_data:
+    driver: local
+  mongodb_read_dev_data:
+    driver: local
+  mongodb_events_dev_data:
+    driver: local

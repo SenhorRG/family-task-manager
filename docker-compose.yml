@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # MongoDB para dados principais
+  mongodb-write:
+    image: mongo:7.0
+    container_name: family-task-manager-mongodb-write
+    environment:
+      MONGO_INITDB_DATABASE: family-task-manager-write
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_write_data:/data/db
+    
+
+  # MongoDB para leitura (replicação)
+  mongodb-read:
+    image: mongo:7.0
+    container_name: family-task-manager-mongodb-read
+    environment:
+      MONGO_INITDB_DATABASE: family-task-manager-read
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_read_data:/data/db
+    
+
+  # MongoDB para eventos
+  mongodb-events:
+    image: mongo:7.0
+    container_name: family-task-manager-mongodb-events
+    environment:
+      MONGO_INITDB_DATABASE: family-task-manager-events
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongodb_events_data:/data/db
+    
+
+  # Aplicação NestJS
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: family-task-manager-app
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_WRITE_URI: mongodb://mongodb-write:27017/family-task-manager-write
+      MONGODB_READ_URI: mongodb://mongodb-read:27017/family-task-manager-read
+      MONGODB_EVENTS_URI: mongodb://mongodb-events:27017/family-task-manager-events
+      JWT_SECRET: 86b5dfc6dfe338a347247090bdf217f4
+      JWT_EXPIRES_IN: 24h
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb-write
+      - mongodb-read
+      - mongodb-events
+    
+
+volumes:
+  mongodb_write_data:
+    driver: local
+  mongodb_read_data:
+    driver: local
+  mongodb_events_data:
+    driver: local
