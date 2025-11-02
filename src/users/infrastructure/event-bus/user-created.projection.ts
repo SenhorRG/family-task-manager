@@ -15,27 +15,25 @@ export class UserCreatedProjection {
 
   async handle(event: UserCreatedEvent): Promise<void> {
     try {
-    const { aggregateId, eventData } = event;
+      const { aggregateId, eventData } = event;
 
-      // Verificar se já existe (idempotência)
       const existing = await this.readModel.findById(aggregateId).exec();
       if (existing) {
         this.logger.warn(
           `User ${aggregateId} already exists in read database, skipping projection`,
         );
         return;
-    }
+      }
 
-    const userData = {
-      _id: aggregateId,
-      fullName: eventData.fullName,
-      email: eventData.email,
-        // Senha não é copiada para o read database por segurança
-      createdAt: eventData.createdAt,
-      updatedAt: eventData.createdAt,
-    };
+      const userData = {
+        _id: aggregateId,
+        fullName: eventData.fullName,
+        email: eventData.email,
+        createdAt: eventData.createdAt,
+        updatedAt: eventData.createdAt,
+      };
 
-    await this.readModel.create(userData);
+      await this.readModel.create(userData);
       this.logger.log(`User ${aggregateId} projected to read database`);
     } catch (error) {
       this.logger.error(`Error projecting UserCreatedEvent: ${error.message}`, error.stack);

@@ -42,11 +42,14 @@ export abstract class MongoEventStore implements EventStore {
       return;
     }
 
-    // Verificar versão atual do aggregate no event store (optimistic locking)
-    const existingEvents = await this.eventModel.find({ aggregateId }).sort({ version: -1 }).limit(1).exec();
-    
+    const existingEvents = await this.eventModel
+      .find({ aggregateId })
+      .sort({ version: -1 })
+      .limit(1)
+      .exec();
+
     const currentVersion = existingEvents.length > 0 ? existingEvents[0].version : 0;
-    
+
     if (currentVersion !== expectedVersion) {
       this.logger.error(
         `Version mismatch for aggregate ${aggregateId}. Expected: ${expectedVersion}, Current: ${currentVersion}`,
@@ -54,13 +57,16 @@ export abstract class MongoEventStore implements EventStore {
       throw new ConcurrentModificationException(aggregateId, expectedVersion, currentVersion);
     }
 
-    // Verificar se a primeira versão do evento corresponde à próxima versão esperada
     const nextExpectedVersion = currentVersion + 1;
     if (events[0].version !== nextExpectedVersion) {
       this.logger.error(
         `Event version mismatch for aggregate ${aggregateId}. Expected first event version: ${nextExpectedVersion}, Actual: ${events[0].version}`,
       );
-      throw new ConcurrentModificationException(aggregateId, nextExpectedVersion, events[0].version);
+      throw new ConcurrentModificationException(
+        aggregateId,
+        nextExpectedVersion,
+        events[0].version,
+      );
     }
 
     const eventDocuments = events.map((event) => ({
@@ -90,14 +96,11 @@ export abstract class MongoEventStore implements EventStore {
 
   private mapToEvent(doc: EventDocument): BaseEvent {
     const eventClass = this.getEventClass(doc.eventType);
-    
-    // Log para debug
+
     this.logger.debug(
       `Mapping event: ${doc.eventType} | aggregateId: ${doc.aggregateId} | aggregateType in DB: "${doc.aggregateType}" | eventClass: ${eventClass?.name || 'NOT FOUND'}`,
     );
-    
-    // Se não encontramos a classe do evento, usar GenericEvent com o aggregateType do documento
-    // IMPORTANTE: Passar o eventType original para preservar no GenericEvent
+
     if (!eventClass || eventClass === BaseEvent || eventClass.name === 'BaseEvent') {
       this.logger.warn(
         `⚠️ Event class not found for ${doc.eventType}, using GenericEvent with original eventType preserved`,
@@ -107,42 +110,34 @@ export abstract class MongoEventStore implements EventStore {
         doc.aggregateType,
         doc.eventData,
         doc.version,
-        doc.eventType, // Preservar o eventType original
+        doc.eventType,
       );
     }
-    
-    // Evento específico encontrado - criar usando o construtor correto
-    // Os eventos específicos esperam (aggregateId, eventData, version)
-    // e internamente chamam super(aggregateId, 'User', eventData, version)
+
     let event: BaseEvent;
-    
+
     try {
       event = new eventClass(doc.aggregateId, doc.eventData, doc.version);
     } catch (error) {
       this.logger.error(
         `❌ Error creating event ${doc.eventType}: ${error.message}. Falling back to BaseEvent.`,
       );
-      // Em caso de erro, criar GenericEvent diretamente
       return new GenericEvent(
         doc.aggregateId,
         String(doc.aggregateType || 'Unknown'),
         doc.eventData,
         doc.version,
-        doc.eventType, // Preservar o eventType original
+        doc.eventType,
       );
     }
-    
-    // SEMPRE garantir que o aggregateType seja uma string válida do documento
-    // O aggregateType do documento é a fonte da verdade
+
     const dbAggregateType = String(doc.aggregateType || 'Unknown');
-    
+
     if (typeof event.aggregateType !== 'string' || event.aggregateType !== dbAggregateType) {
       this.logger.warn(
         `⚠️ Fixing aggregateType for ${doc.eventType}: event has "${String(event.aggregateType)}" (${typeof event.aggregateType}), DB has "${dbAggregateType}". Using DB value.`,
       );
-      
-      // Substituir a propriedade readonly usando defineProperty
-      // Isso é necessário porque aggregateType é readonly
+
       Object.defineProperty(event, 'aggregateType', {
         value: dbAggregateType,
         writable: false,
@@ -150,7 +145,7 @@ export abstract class MongoEventStore implements EventStore {
         enumerable: true,
       });
     }
-    
+
     return event;
   }
 

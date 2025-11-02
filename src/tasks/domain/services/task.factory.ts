@@ -101,23 +101,14 @@ export class TaskFactory {
     );
   }
 
-  /**
-   * Reconstrói um Task aggregate a partir de eventos (Event Sourcing)
-   * @param aggregateId ID do aggregate
-   * @param events Lista de eventos ordenados por versão
-   * @returns Task aggregate reconstruído
-   */
   reconstructTaskFromEvents(aggregateId: string, events: BaseEvent[]): Task {
     if (events.length === 0) {
       throw new Error(`No events found for task ${aggregateId}`);
     }
 
-    // Primeiro evento deve ser TaskCreatedEvent
     const firstEvent = events[0];
     if (!(firstEvent instanceof TaskCreatedEvent)) {
-      throw new Error(
-        `First event must be TaskCreatedEvent, but got ${firstEvent.eventType}`,
-      );
+      throw new Error(`First event must be TaskCreatedEvent, but got ${firstEvent.eventType}`);
     }
 
     const taskId = new TaskId(aggregateId);
@@ -132,7 +123,6 @@ export class TaskFactory {
       (userId) => new TaskAssignmentVO(new UserId(userId), createdBy),
     );
 
-    // Criar Task sem emitir eventos (já passamos createdAt para indicar que não é novo)
     const task = new Task(
       taskId,
       taskTitle,
@@ -147,7 +137,6 @@ export class TaskFactory {
       firstEvent.occurredOn,
     );
 
-    // Carregar eventos restantes (pular o primeiro que já foi aplicado no construtor)
     const remainingEvents = events.slice(1);
     if (remainingEvents.length > 0) {
       task.loadFromHistory(remainingEvents);

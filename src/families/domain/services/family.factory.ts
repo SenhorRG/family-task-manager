@@ -59,23 +59,14 @@ export class FamilyFactory {
     return new Family(familyId, familyName, familyMembers[0], familyMembers, createdAt, updatedAt);
   }
 
-  /**
-   * Reconstrói um Family aggregate a partir de eventos (Event Sourcing)
-   * @param aggregateId ID do aggregate
-   * @param events Lista de eventos ordenados por versão
-   * @returns Family aggregate reconstruído
-   */
   reconstructFamilyFromEvents(aggregateId: string, events: BaseEvent[]): Family {
     if (events.length === 0) {
       throw new Error(`No events found for family ${aggregateId}`);
     }
 
-    // Primeiro evento deve ser FamilyCreatedEvent
     const firstEvent = events[0];
     if (!(firstEvent instanceof FamilyCreatedEvent)) {
-      throw new Error(
-        `First event must be FamilyCreatedEvent, but got ${firstEvent.eventType}`,
-      );
+      throw new Error(`First event must be FamilyCreatedEvent, but got ${firstEvent.eventType}`);
     }
 
     const familyId = new FamilyId(aggregateId);
@@ -85,9 +76,12 @@ export class FamilyFactory {
     const principalResponsibility = new FamilyResponsibilityVO(
       FamilyResponsibility.PRINCIPAL_RESPONSIBLE,
     );
-    const principalMember = new FamilyMemberVO(principalUserId, principalRole, principalResponsibility);
+    const principalMember = new FamilyMemberVO(
+      principalUserId,
+      principalRole,
+      principalResponsibility,
+    );
 
-    // Criar Family sem emitir eventos (já passamos createdAt para indicar que não é novo)
     const family = new Family(
       familyId,
       familyName,
@@ -97,7 +91,6 @@ export class FamilyFactory {
       firstEvent.occurredOn,
     );
 
-    // Carregar eventos restantes (pular o primeiro que já foi aplicado no construtor)
     const remainingEvents = events.slice(1);
     if (remainingEvents.length > 0) {
       family.loadFromHistory(remainingEvents);

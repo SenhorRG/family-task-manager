@@ -17,7 +17,6 @@ export class TaskUpdatedProjection {
     try {
       const { aggregateId, eventData } = event;
 
-      // Verificar se a tarefa existe
       const task = await this.readModel.findById(aggregateId).exec();
       if (!task) {
         this.logger.warn(`Task ${aggregateId} not found in read database, skipping projection`);

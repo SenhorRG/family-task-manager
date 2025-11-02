@@ -19,15 +19,9 @@ describe('CQRS Load Tests', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    userWriteModel = moduleFixture.get<Model<any>>(
-      getModelToken('User', 'writeConnection'),
-    );
-    userReadModel = moduleFixture.get<Model<any>>(
-      getModelToken('User', 'readConnection'),
-    );
-    eventModel = moduleFixture.get<Model<any>>(
-      getModelToken('Event', 'eventsConnection'),
-    );
+    userWriteModel = moduleFixture.get<Model<any>>(getModelToken('User', 'writeConnection'));
+    userReadModel = moduleFixture.get<Model<any>>(getModelToken('User', 'readConnection'));
+    eventModel = moduleFixture.get<Model<any>>(getModelToken('Event', 'eventsConnection'));
   });
 
   beforeEach(async () => {
@@ -58,24 +52,19 @@ describe('CQRS Load Tests', () => {
 
     const responses = await Promise.all(requests);
 
-    // Todas devem ter sucesso
     responses.forEach((response, index) => {
-      expect([201, 409]).toContain(response.status); // 201 created ou 409 conflict (email duplicado é OK)
+      expect([201, 409]).toContain(response.status);
     });
 
-    // Aguardar sincronização
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Verificar sincronização
     const writeCount = await userWriteModel.countDocuments();
     const readCount = await userReadModel.countDocuments();
     const eventCount = await eventModel.countDocuments({ aggregateType: 'User' });
 
-    // Verificar que não há race conditions
-    expect(Math.abs(writeCount - readCount)).toBeLessThanOrEqual(1); // Permitir pequena diferença de timing
+    expect(Math.abs(writeCount - readCount)).toBeLessThanOrEqual(1);
     expect(eventCount).toBeGreaterThan(0);
 
-    // Verificar que eventos foram salvos sem duplicação de versão
     const allEvents = await eventModel.find({ aggregateType: 'User' }).exec();
     const versionMap = new Map<string, Set<number>>();
 
@@ -84,7 +73,7 @@ describe('CQRS Load Tests', () => {
         versionMap.set(event.aggregateId, new Set());
       }
       const versions = versionMap.get(event.aggregateId)!;
-      expect(versions.has(event.version)).toBe(false); // Não deve haver versões duplicadas
+      expect(versions.has(event.version)).toBe(false);
       versions.add(event.version);
     });
   });
@@ -92,7 +81,6 @@ describe('CQRS Load Tests', () => {
   it('should maintain read database sync under load', async () => {
     const numberOfUsers = 20;
 
-    // Criar usuários sequencialmente
     const userIds: string[] = [];
     for (let i = 0; i < numberOfUsers; i++) {
       const response = await request(app.getHttpServer())
@@ -107,17 +95,14 @@ describe('CQRS Load Tests', () => {
       userIds.push(response.body.id);
     }
 
-    // Aguardar todas as projeções processarem
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    // Verificar que todos estão sincronizados
     const writeCount = await userWriteModel.countDocuments();
     const readCount = await userReadModel.countDocuments();
 
     expect(writeCount).toBe(numberOfUsers);
     expect(readCount).toBe(numberOfUsers);
 
-    // Verificar cada usuário individualmente
     for (const userId of userIds) {
       const userInWrite = await userWriteModel.findById(userId).exec();
       const userInRead = await userReadModel.findById(userId).exec();
@@ -127,9 +112,7 @@ describe('CQRS Load Tests', () => {
       expect(userInRead?.email).toBe(userInWrite?.email);
     }
 
-    // Verificar eventos
     const eventCount = await eventModel.countDocuments({ aggregateType: 'User' });
     expect(eventCount).toBeGreaterThanOrEqual(numberOfUsers);
   });
 });
-

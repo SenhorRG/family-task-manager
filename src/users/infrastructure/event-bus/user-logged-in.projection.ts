@@ -15,21 +15,22 @@ export class UserLoggedInProjection {
 
   async handle(event: UserLoggedInEvent): Promise<void> {
     try {
-    const { aggregateId, eventData } = event;
+      const { aggregateId, eventData } = event;
 
-      // Verificar se o usuário existe (idempotência)
       const user = await this.readModel.findById(aggregateId).exec();
       if (!user) {
-        this.logger.warn(`User ${aggregateId} not found in read database, skipping login projection`);
+        this.logger.warn(
+          `User ${aggregateId} not found in read database, skipping login projection`,
+        );
         return;
       }
 
-    await this.readModel.findByIdAndUpdate(aggregateId, {
+      await this.readModel.findByIdAndUpdate(aggregateId, {
         $set: {
-      lastLoginAt: eventData.loggedInAt,
-      updatedAt: eventData.loggedInAt,
+          lastLoginAt: eventData.loggedInAt,
+          updatedAt: eventData.loggedInAt,
         },
-    });
+      });
 
       this.logger.log(`User ${aggregateId} last login updated`);
     } catch (error) {

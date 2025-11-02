@@ -23,31 +23,16 @@ describe('CQRS Event Sourcing Integration Tests', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    userWriteModel = moduleFixture.get<Model<any>>(
-      getModelToken('User', 'writeConnection'),
-    );
-    userReadModel = moduleFixture.get<Model<any>>(
-      getModelToken('User', 'readConnection'),
-    );
-    familyWriteModel = moduleFixture.get<Model<any>>(
-      getModelToken('Family', 'writeConnection'),
-    );
-    familyReadModel = moduleFixture.get<Model<any>>(
-      getModelToken('Family', 'readConnection'),
-    );
-    taskWriteModel = moduleFixture.get<Model<any>>(
-      getModelToken('Task', 'writeConnection'),
-    );
-    taskReadModel = moduleFixture.get<Model<any>>(
-      getModelToken('Task', 'readConnection'),
-    );
-    eventModel = moduleFixture.get<Model<any>>(
-      getModelToken('Event', 'eventsConnection'),
-    );
+    userWriteModel = moduleFixture.get<Model<any>>(getModelToken('User', 'writeConnection'));
+    userReadModel = moduleFixture.get<Model<any>>(getModelToken('User', 'readConnection'));
+    familyWriteModel = moduleFixture.get<Model<any>>(getModelToken('Family', 'writeConnection'));
+    familyReadModel = moduleFixture.get<Model<any>>(getModelToken('Family', 'readConnection'));
+    taskWriteModel = moduleFixture.get<Model<any>>(getModelToken('Task', 'writeConnection'));
+    taskReadModel = moduleFixture.get<Model<any>>(getModelToken('Task', 'readConnection'));
+    eventModel = moduleFixture.get<Model<any>>(getModelToken('Event', 'eventsConnection'));
   });
 
   beforeEach(async () => {
-    // Limpar todos os bancos antes de cada teste
     await userWriteModel.deleteMany({});
     await userReadModel.deleteMany({});
     await familyWriteModel.deleteMany({});
@@ -76,29 +61,22 @@ describe('CQRS Event Sourcing Integration Tests', () => {
 
       const userId = response.body.id;
 
-      // Aguardar um pouco para a projeção processar
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Verificar write database
       const userInWrite = await userWriteModel.findById(userId).exec();
       expect(userInWrite).toBeDefined();
       expect(userInWrite.email).toBe(userData.email);
 
-      // Verificar read database
       const userInRead = await userReadModel.findById(userId).exec();
       expect(userInRead).toBeDefined();
       expect(userInRead.email).toBe(userData.email);
 
-      // Verificar event store
-      const events = await eventModel
-        .find({ aggregateId: userId, aggregateType: 'User' })
-        .exec();
+      const events = await eventModel.find({ aggregateId: userId, aggregateType: 'User' }).exec();
       expect(events.length).toBeGreaterThan(0);
       expect(events.some((e) => e.eventType === 'UserCreatedEvent')).toBe(true);
     });
 
     it('should delete user and sync to read database', async () => {
-      // Criar usuário primeiro
       const userData = {
         fullName: 'Test User',
         email: 'test@example.com',
@@ -112,21 +90,12 @@ describe('CQRS Event Sourcing Integration Tests', () => {
 
       const userId = createResponse.body.id;
 
-      // Aguardar sincronização
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Deletar usuário (assumindo que há endpoint DELETE)
-      // Nota: Este teste depende de ter um endpoint DELETE implementado
-
-      // Verificar que foi deletado do write
-      // Verificar que foi deletado do read
-      // Verificar que evento de delete foi criado
     });
   });
 
   describe('Family Synchronization', () => {
     it('should create family and sync to read database', async () => {
-      // Primeiro criar um usuário
       const userData = {
         fullName: 'Test User',
         email: 'test@example.com',
@@ -140,11 +109,8 @@ describe('CQRS Event Sourcing Integration Tests', () => {
 
       const userId = userResponse.body.id;
 
-      // Aguardar sincronização
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Criar família (assumindo endpoint)
-      // Verificar sincronização
     });
   });
 
@@ -163,13 +129,9 @@ describe('CQRS Event Sourcing Integration Tests', () => {
 
       const userId = response.body.id;
 
-      // Aguardar processamento
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const events = await eventModel
-        .find({ aggregateId: userId })
-        .sort({ version: 1 })
-        .exec();
+      const events = await eventModel.find({ aggregateId: userId }).sort({ version: 1 }).exec();
 
       expect(events.length).toBeGreaterThan(0);
       expect(events[0].eventType).toBe('UserCreatedEvent');
@@ -178,4 +140,3 @@ describe('CQRS Event Sourcing Integration Tests', () => {
     });
   });
 });
-

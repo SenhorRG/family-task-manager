@@ -26,7 +26,6 @@ export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggre
       throw new Error('EventStore not found. Make sure it is registered in a module.');
     }
 
-    // Selecionar rehydrator baseado no tipo
     let rehydrator;
     switch (command.aggregateType.toUpperCase()) {
       case 'USER':
@@ -39,11 +38,12 @@ export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggre
         rehydrator = this.taskRehydrator;
         break;
       default:
-        throw new Error(`Invalid aggregate type: ${command.aggregateType}. Use USER, FAMILY, or TASK`);
+        throw new Error(
+          `Invalid aggregate type: ${command.aggregateType}. Use USER, FAMILY, or TASK`,
+        );
     }
 
     try {
-      // Verificar se já existe
       const exists = await rehydrator.checkExists(command.aggregateId);
       if (exists) {
         this.logger.warn(
@@ -55,13 +55,11 @@ export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggre
         };
       }
 
-      // Obter eventos
       const events = await this.eventStore.getEvents(command.aggregateId);
       if (events.length === 0) {
         throw new Error(`No events found for ${command.aggregateType} ${command.aggregateId}`);
       }
 
-      // Verificar tipo do aggregate
       const firstEvent = events[0];
       if (firstEvent.aggregateType !== command.aggregateType) {
         throw new Error(
@@ -69,10 +67,8 @@ export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggre
         );
       }
 
-      // Reconstruir aggregate
       const aggregate = await rehydrator.rehydrateAggregate(command.aggregateId, events);
 
-      // Salvar sem eventos
       await rehydrator.saveWithoutEvents(aggregate);
 
       this.logger.log(`✅ ${command.aggregateType} ${command.aggregateId} successfully rehydrated`);

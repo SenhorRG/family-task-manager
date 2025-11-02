@@ -66,7 +66,9 @@ export class RehydrateAllAggregatesHandler
         rehydrator = this.taskRehydrator;
         break;
       default:
-        throw new Error(`Invalid aggregate type: ${command.aggregateType}. Use USER, FAMILY, or TASK`);
+        throw new Error(
+          `Invalid aggregate type: ${command.aggregateType}. Use USER, FAMILY, or TASK`,
+        );
     }
 
     const result = await this.rehydrateAllForType(command.aggregateType, rehydrator);
@@ -98,11 +100,9 @@ export class RehydrateAllAggregatesHandler
     };
 
     try {
-      // Obter todos os eventos
       const allEvents = await this.eventStore!.getAllEvents();
       this.logger.log(`📊 Found ${allEvents.length} total events in Event Store`);
 
-      // Filtrar eventos do tipo correto e agrupar por aggregateId
       const eventsByAggregate = new Map<string, BaseEvent[]>();
 
       for (const event of allEvents) {
@@ -119,7 +119,6 @@ export class RehydrateAllAggregatesHandler
       );
       result.total = eventsByAggregate.size;
 
-      // Rehydratar cada aggregate
       for (const [aggregateId, events] of eventsByAggregate) {
         try {
           const exists = await rehydrator.checkExists(aggregateId);

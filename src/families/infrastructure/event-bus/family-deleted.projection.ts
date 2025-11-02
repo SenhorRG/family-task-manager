@@ -16,11 +16,11 @@ export class FamilyDeletedProjection {
   async handle(event: FamilyDeletedEvent): Promise<void> {
     try {
       const { aggregateId } = event;
-
-      // Verificar se a família existe (idempotência)
       const family = await this.readModel.findById(aggregateId).exec();
       if (!family) {
-        this.logger.warn(`Family ${aggregateId} not found in read database, skipping delete projection`);
+        this.logger.warn(
+          `Family ${aggregateId} not found in read database, skipping delete projection`,
+        );
         return;
       }
 
@@ -32,4 +32,3 @@ export class FamilyDeletedProjection {
     }
   }
 }
-

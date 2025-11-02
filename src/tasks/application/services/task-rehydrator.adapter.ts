@@ -51,7 +51,6 @@ export class TaskRehydratorAdapter implements AggregateRehydrator<Task> {
       await this.writeModel.create(taskData);
     } catch (error) {
       if (error.code === 11000) {
-        // Duplicate key - atualizar existente
         await this.writeModel.findByIdAndUpdate(task.taskId.value, taskData, {
           new: true,
         });

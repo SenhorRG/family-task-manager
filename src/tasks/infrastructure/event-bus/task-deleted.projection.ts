@@ -17,7 +17,6 @@ export class TaskDeletedProjection {
     try {
       const { aggregateId } = event;
 
-      // Verificar se a tarefa existe (idempotência)
       const task = await this.readModel.findById(aggregateId).exec();
       if (!task) {
         this.logger.warn(`Task ${aggregateId} not found in read database, skipping delete projection`);

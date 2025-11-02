@@ -152,7 +152,7 @@ describe('MongoFamilyRepository', () => {
       expect(eventStore.saveEvents).toHaveBeenCalledWith(
         familyId.value,
         [mockEvent],
-        1, // version - uncommittedEvents.length
+        1,
       );
       expect(eventBus.publish).toHaveBeenCalledWith(mockEvent);
       expect(mockFamily.markEventsAsCommitted).toHaveBeenCalled();
@@ -179,7 +179,6 @@ describe('MongoFamilyRepository', () => {
 
   describe('findById', () => {
     it('it should return a family when found', async () => {
-      // Arrange
       const familyId = new FamilyId(makeObjectId());
       const mockDocument = {
         _id: familyId.value,

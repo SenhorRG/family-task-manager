@@ -6,12 +6,11 @@ import { ConfigService } from './shared';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Configurar ValidationPipe globalmente para transformar tipos automaticamente
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, // Transforma tipos automaticamente (string -> Date, etc)
-      whitelist: true, // Remove propriedades não definidas no DTO
-      forbidNonWhitelisted: true, // Retorna erro se propriedades não definidas forem enviadas
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 

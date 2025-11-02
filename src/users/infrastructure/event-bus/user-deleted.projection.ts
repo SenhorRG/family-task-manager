@@ -17,10 +17,11 @@ export class UserDeletedProjection {
     try {
       const { aggregateId } = event;
 
-      // Verificar se o usuário existe (idempotência)
       const user = await this.readModel.findById(aggregateId).exec();
       if (!user) {
-        this.logger.warn(`User ${aggregateId} not found in read database, skipping delete projection`);
+        this.logger.warn(
+          `User ${aggregateId} not found in read database, skipping delete projection`,
+        );
         return;
       }
 
@@ -32,4 +33,3 @@ export class UserDeletedProjection {
     }
   }
 }
-

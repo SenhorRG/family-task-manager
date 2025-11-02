@@ -17,7 +17,6 @@ export class FamilyCreatedProjection {
     try {
       const { aggregateId, eventData } = event;
 
-      // Verificar se já existe (idempotência)
       const existing = await this.readModel.findById(aggregateId).exec();
       if (existing) {
         this.logger.warn(

@@ -67,13 +67,10 @@ const EventSchema = new Schema({
   version: { type: Number, required: true },
 });
 
-// Adicionar índices para melhorar performance
-EventSchema.index({ aggregateId: 1, version: 1 }); // Compound index para queries por aggregate e versão
-EventSchema.index({ aggregateId: 1 }); // Index para queries por aggregate
-EventSchema.index({ occurredOn: 1 }); // Index para ordenação cronológica
-EventSchema.index({ eventType: 1 }); // Index para filtros por tipo de evento
-EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggregate
-
+EventSchema.index({ aggregateId: 1 });
+EventSchema.index({ occurredOn: 1 });
+EventSchema.index({ eventType: 1 });
+EventSchema.index({ aggregateType: 1 });
 @Module({
   imports: [
     CqrsModule,

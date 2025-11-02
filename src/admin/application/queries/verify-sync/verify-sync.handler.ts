@@ -52,7 +52,6 @@ export class VerifySyncHandler implements IQueryHandler<VerifySyncQuery> {
   async execute(): Promise<SyncReport> {
     this.logger.log('🔍 Verificando sincronização entre write, read e events databases...');
 
-    // Criar schemas temporários se não existirem
     const UserSchema = new Schema({}, { strict: false, collection: 'users' });
     const FamilySchema = new Schema({}, { strict: false, collection: 'families' });
     const TaskSchema = new Schema({}, { strict: false, collection: 'tasks' });
@@ -105,7 +104,6 @@ export class VerifySyncHandler implements IQueryHandler<VerifySyncQuery> {
       },
     };
 
-    // Verificar Users
     this.logger.log('🔍 Verificando Users...');
     const usersWrite = await UserWriteModel.find().exec();
     const usersRead = await UserReadModel.find().exec();
@@ -142,7 +140,6 @@ export class VerifySyncHandler implements IQueryHandler<VerifySyncQuery> {
       }
     });
 
-    // Verificar Families
     this.logger.log('🔍 Verificando Families...');
     const familiesWrite = await FamilyWriteModel.find().exec();
     const familiesRead = await FamilyReadModel.find().exec();
@@ -179,7 +176,6 @@ export class VerifySyncHandler implements IQueryHandler<VerifySyncQuery> {
       }
     });
 
-    // Verificar Tasks
     this.logger.log('🔍 Verificando Tasks...');
     const tasksWrite = await TaskWriteModel.find().exec();
     const tasksRead = await TaskReadModel.find().exec();

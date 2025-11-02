@@ -17,14 +17,12 @@ export class MemberAddedProjection {
     try {
       const { aggregateId, eventData } = event;
 
-      // Verificar se a família existe
       const family = await this.readModel.findById(aggregateId).exec();
       if (!family) {
         this.logger.warn(`Family ${aggregateId} not found in read database, skipping projection`);
         return;
       }
 
-      // Verificar se o membro já existe (idempotência)
       const memberExists = family.members.some((m) => m.userId === eventData.userId);
       if (memberExists) {
         this.logger.warn(

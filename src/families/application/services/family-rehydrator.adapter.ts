@@ -7,12 +7,7 @@ import { Family } from '../../domain/aggregates';
 import { FamilySchema } from '../../infrastructure/persistence/mongoose/schemas';
 import { AggregateRehydrator } from '../../../shared/domain/ports/aggregate-rehydrator.port';
 
-/**
- * Adapter que implementa AggregateRehydrator para Family
- *
- * Responsável por reconstruir aggregates do tipo Family a partir de eventos do Event Store.
- * Esta classe segue o padrão Adapter e está na camada de Application Services.
- */
+
 @Injectable()
 export class FamilyRehydratorAdapter implements AggregateRehydrator<Family> {
   constructor(
@@ -52,7 +47,6 @@ export class FamilyRehydratorAdapter implements AggregateRehydrator<Family> {
       await this.writeModel.create(familyData);
     } catch (error) {
       if (error.code === 11000) {
-        // Duplicate key - atualizar existente
         await this.writeModel.findByIdAndUpdate(family.familyId.value, familyData, {
           new: true,
         });

@@ -36,13 +36,6 @@ export class UserFactory {
     return new User(userId, userFullName, userEmail, userPassword, createdAt, updatedAt);
   }
 
-  /**
-   * Reconstrói um User aggregate a partir de eventos (Event Sourcing)
-   * @param aggregateId ID do aggregate
-   * @param events Lista de eventos ordenados por versão
-   * @param hashedPassword Senha hasheada (necessária pois não está nos eventos por segurança)
-   * @returns User aggregate reconstruído
-   */
   reconstructUserFromEvents(
     aggregateId: string,
     events: BaseEvent[],
@@ -52,12 +45,11 @@ export class UserFactory {
       throw new Error(`No events found for user ${aggregateId}`);
     }
 
-    // Primeiro evento deve ser UserCreatedEvent (ou GenericEvent com eventType UserCreatedEvent)
     const firstEvent = events[0];
     const isUserCreatedEvent =
       firstEvent instanceof UserCreatedEvent ||
       (firstEvent.eventType === 'UserCreatedEvent' && firstEvent.aggregateType === 'User');
-    
+
     if (!isUserCreatedEvent) {
       throw new Error(
         `First event must be UserCreatedEvent, but got ${firstEvent.eventType} (aggregateType: ${firstEvent.aggregateType})`,
@@ -69,7 +61,6 @@ export class UserFactory {
     const userEmail = new Email(firstEvent.eventData.email);
     const userPassword = new Password(hashedPassword, this.passwordHasher, true);
 
-    // Criar User sem emitir eventos (já passamos createdAt para indicar que não é novo)
     const user = new User(
       userId,
       userFullName,
@@ -79,7 +70,6 @@ export class UserFactory {
       firstEvent.occurredOn,
     );
 
-    // Carregar eventos restantes (pular o primeiro que já foi aplicado no construtor)
     const remainingEvents = events.slice(1);
     if (remainingEvents.length > 0) {
       user.loadFromHistory(remainingEvents);

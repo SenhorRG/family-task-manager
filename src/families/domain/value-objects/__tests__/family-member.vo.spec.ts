@@ -150,7 +150,6 @@ describe('FamilyMemberVO', () => {
 
   describe('equals', () => {
     it('it should return true when members have the same userId', () => {
-      // Arrange
       const member1 = new FamilyMemberVO(
         userId,
         new FamilyRoleVO(FamilyRole.FATHER),
