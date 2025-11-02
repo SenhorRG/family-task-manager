@@ -1,7 +1,9 @@
-import { IsISO8601 } from 'class-validator';
+import { IsDate } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class ReplayEventsAfterDto {
-  @IsISO8601()
-  timestamp: string;
+  @Type(() => Date)
+  @IsDate({ message: 'Timestamp must be a valid date' })
+  timestamp: Date;
 }
 

@@ -771,23 +771,6 @@
       "name": "5. Admin",
       "item": [
         {
-          "name": "Replay - Info",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/admin/replay/info",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "replay", "info"]
-            }
-          }
-        },
-        {
           "name": "Replay - Todos os Eventos",
           "request": {
             "method": "POST",

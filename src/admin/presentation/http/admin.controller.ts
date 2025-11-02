@@ -46,26 +46,10 @@ export class AdminController {
    */
   @Post('replay/incremental')
   async replayEventsAfter(@Body() body: ReplayEventsAfterDto) {
-    const timestamp = new Date(body.timestamp);
-    this.logger.log(`🔄 Replay incremental após ${timestamp.toISOString()} solicitado via API...`);
-    return this.commandBus.execute(new ReplayEventsAfterCommand(timestamp));
+    this.logger.log(`🔄 Replay incremental após ${body.timestamp.toISOString()} solicitado via API...`);
+    return this.commandBus.execute(new ReplayEventsAfterCommand(body.timestamp));
   }
 
-  /**
-   * Informações sobre o replay
-   * GET /admin/replay/info
-   */
-  @Get('replay/info')
-  getReplayInfo() {
-    return {
-      message: 'Event Replay API',
-      endpoints: {
-        full: 'POST /admin/replay/all',
-        aggregate: 'POST /admin/replay/aggregate/:aggregateId',
-        incremental: 'POST /admin/replay/incremental (body: { timestamp: "ISO_DATE" })',
-      },
-    };
-  }
 
   /**
    * Rehydrata todos os aggregates ou um tipo específico
