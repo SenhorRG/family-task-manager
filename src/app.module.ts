@@ -9,11 +9,10 @@ import {
   DatabaseModule,
   AppLoggerInterceptor,
   HttpExceptionFilter,
-  EventStoreModule,
 } from './shared';
 
 @Module({
-  imports: [DatabaseModule, EventStoreModule, UsersModule, FamiliesModule, TasksModule, AdminModule],
+  imports: [DatabaseModule, UsersModule, FamiliesModule, TasksModule, AdminModule],
   controllers: [AppController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AppLoggerInterceptor },

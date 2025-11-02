@@ -5,11 +5,8 @@ import { BaseEvent } from '../../../shared';
 import { TaskFactory } from '../../domain/services';
 import { Task } from '../../domain/aggregates';
 import { TaskSchema } from '../../infrastructure/persistence/mongoose/schemas';
-import { AggregateRehydrator } from '../../../shared/application/services/aggregate-rehydration.service';
+import { AggregateRehydrator } from '../../../shared/domain/ports/aggregate-rehydrator.port';
 
-/**
- * Adapter que implementa AggregateRehydrator para Task
- */
 @Injectable()
 export class TaskRehydratorAdapter implements AggregateRehydrator<Task> {
   constructor(
@@ -28,7 +25,7 @@ export class TaskRehydratorAdapter implements AggregateRehydrator<Task> {
   }
 
   async rehydrateAggregate(aggregateId: string, events: BaseEvent[]): Promise<Task> {
-    return this.taskFactory.reconstructTaskFromEvents(aggregateId, events);
+    return Promise.resolve(this.taskFactory.reconstructTaskFromEvents(aggregateId, events));
   }
 
   async saveWithoutEvents(task: Task): Promise<void> {
@@ -50,10 +47,17 @@ export class TaskRehydratorAdapter implements AggregateRehydrator<Task> {
       updatedAt: task.updatedAt,
     };
 
-    await this.writeModel.findByIdAndUpdate(task.taskId.value, taskData, {
-      upsert: true,
-      new: true,
-    });
+    try {
+      await this.writeModel.create(taskData);
+    } catch (error) {
+      if (error.code === 11000) {
+        // Duplicate key - atualizar existente
+        await this.writeModel.findByIdAndUpdate(task.taskId.value, taskData, {
+          new: true,
+        });
+      } else {
+        throw error;
+      }
+    }
   }
 }
-

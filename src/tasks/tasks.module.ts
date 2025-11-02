@@ -142,6 +142,13 @@ EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggre
     TaskAssignmentRemovedProjection,
     TaskDeletedProjection,
   ],
-  exports: ['TaskRepository', 'TaskReadRepository', 'EventStore', 'IdGenerator', TaskFactory],
+  exports: [
+    'TaskRepository',
+    'TaskReadRepository',
+    'EventStore',
+    'IdGenerator',
+    TaskFactory,
+    TaskRehydratorAdapter,
+  ],
 })
 export class TasksModule {}

@@ -25,7 +25,6 @@ import { MongoObjectIdGenerator, BcryptPasswordHasher } from '../shared';
 import { UserFactory } from './domain/services';
 
 // Application Services
-import { UserRehydrationService } from './application/services/user-rehydration.service';
 import { UserRehydratorAdapter } from './application/services/user-rehydrator.adapter';
 
 // Presentation
@@ -118,7 +117,6 @@ EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggre
     UserFactory,
 
     // Application Services
-    UserRehydrationService,
     UserRehydratorAdapter,
 
     // Event Handlers
@@ -136,6 +134,7 @@ EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggre
     'IdGenerator',
     'PasswordHasher',
     UserFactory,
+    UserRehydratorAdapter,
   ],
 })
 export class UsersModule {}

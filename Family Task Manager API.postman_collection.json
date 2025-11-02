@@ -766,6 +766,279 @@
           }
         }
       ]
+    },
+    {
+      "name": "5. Admin",
+      "item": [
+        {
+          "name": "Replay - Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/replay/info",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "replay", "info"]
+            }
+          }
+        },
+        {
+          "name": "Replay - Todos os Eventos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/replay/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "replay", "all"]
+            }
+          }
+        },
+        {
+          "name": "Replay - Eventos de um Aggregate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/replay/aggregate/:aggregateId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "replay", "aggregate", ":aggregateId"],
+              "variable": [
+                {
+                  "key": "aggregateId",
+                  "value": "digite-o-id-do-aggregate"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Replay - Eventos Incrementais (Após Data)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"timestamp\": \"2025-01-01T00:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/replay/incremental",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "replay", "incremental"]
+            }
+          }
+        },
+        {
+          "name": "Rehydrate - Todos os Aggregates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/rehydrate/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "rehydrate", "all"]
+            }
+          }
+        },
+        {
+          "name": "Rehydrate - Todos por Tipo (USER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/rehydrate/all?aggregateType=USER",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "rehydrate", "all"],
+              "query": [
+                {
+                  "key": "aggregateType",
+                  "value": "USER"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rehydrate - Todos por Tipo (FAMILY)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/rehydrate/all?aggregateType=FAMILY",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "rehydrate", "all"],
+              "query": [
+                {
+                  "key": "aggregateType",
+                  "value": "FAMILY"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rehydrate - Todos por Tipo (TASK)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/rehydrate/all?aggregateType=TASK",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "rehydrate", "all"],
+              "query": [
+                {
+                  "key": "aggregateType",
+                  "value": "TASK"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rehydrate - Aggregate Específico (USER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/rehydrate/:aggregateId?aggregateType=USER",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "rehydrate", ":aggregateId"],
+              "variable": [
+                {
+                  "key": "aggregateId",
+                  "value": "digite-o-id-do-aggregate"
+                }
+              ],
+              "query": [
+                {
+                  "key": "aggregateType",
+                  "value": "USER"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rehydrate - Aggregate Específico (FAMILY)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/rehydrate/:aggregateId?aggregateType=FAMILY",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "rehydrate", ":aggregateId"],
+              "variable": [
+                {
+                  "key": "aggregateId",
+                  "value": "digite-o-id-do-aggregate"
+                }
+              ],
+              "query": [
+                {
+                  "key": "aggregateType",
+                  "value": "FAMILY"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rehydrate - Aggregate Específico (TASK)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/rehydrate/:aggregateId?aggregateType=TASK",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "rehydrate", ":aggregateId"],
+              "variable": [
+                {
+                  "key": "aggregateId",
+                  "value": "digite-o-id-do-aggregate"
+                }
+              ],
+              "query": [
+                {
+                  "key": "aggregateType",
+                  "value": "TASK"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sync - Verificar Sincronização",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "verify"]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [

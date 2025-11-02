@@ -5,10 +5,13 @@ import { BaseEvent } from '../../../shared';
 import { FamilyFactory } from '../../domain/services';
 import { Family } from '../../domain/aggregates';
 import { FamilySchema } from '../../infrastructure/persistence/mongoose/schemas';
-import { AggregateRehydrator } from '../../../shared/application/services/aggregate-rehydration.service';
+import { AggregateRehydrator } from '../../../shared/domain/ports/aggregate-rehydrator.port';
 
 /**
  * Adapter que implementa AggregateRehydrator para Family
+ *
+ * Responsável por reconstruir aggregates do tipo Family a partir de eventos do Event Store.
+ * Esta classe segue o padrão Adapter e está na camada de Application Services.
  */
 @Injectable()
 export class FamilyRehydratorAdapter implements AggregateRehydrator<Family> {
@@ -28,7 +31,7 @@ export class FamilyRehydratorAdapter implements AggregateRehydrator<Family> {
   }
 
   async rehydrateAggregate(aggregateId: string, events: BaseEvent[]): Promise<Family> {
-    return this.familyFactory.reconstructFamilyFromEvents(aggregateId, events);
+    return Promise.resolve(this.familyFactory.reconstructFamilyFromEvents(aggregateId, events));
   }
 
   async saveWithoutEvents(family: Family): Promise<void> {
@@ -45,10 +48,17 @@ export class FamilyRehydratorAdapter implements AggregateRehydrator<Family> {
       updatedAt: family.updatedAt,
     };
 
-    await this.writeModel.findByIdAndUpdate(family.familyId.value, familyData, {
-      upsert: true,
-      new: true,
-    });
+    try {
+      await this.writeModel.create(familyData);
+    } catch (error) {
+      if (error.code === 11000) {
+        // Duplicate key - atualizar existente
+        await this.writeModel.findByIdAndUpdate(family.familyId.value, familyData, {
+          new: true,
+        });
+      } else {
+        throw error;
+      }
+    }
   }
 }
-

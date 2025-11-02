@@ -129,6 +129,13 @@ EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggre
     MemberRoleChangedProjection,
     FamilyDeletedProjection,
   ],
-  exports: ['FamilyRepository', 'FamilyReadRepository', 'EventStore', 'IdGenerator', FamilyFactory],
+  exports: [
+    'FamilyRepository',
+    'FamilyReadRepository',
+    'EventStore',
+    'IdGenerator',
+    FamilyFactory,
+    FamilyRehydratorAdapter,
+  ],
 })
 export class FamiliesModule {}
