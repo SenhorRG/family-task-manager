@@ -17,11 +17,16 @@ import {
   UserSchema,
   UserSchemaFactory,
 } from './infrastructure/persistence';
+import { UserReadSchema, UserReadSchemaFactory } from './infrastructure/persistence/mongoose/schemas/user-read.schema';
 import { UserMongoEventStore } from './infrastructure/event-store';
 import { MongoObjectIdGenerator, BcryptPasswordHasher } from '../shared';
 
 // Domain Services
 import { UserFactory } from './domain/services';
+
+// Application Services
+import { UserRehydrationService } from './application/services/user-rehydration.service';
+import { UserRehydratorAdapter } from './application/services/user-rehydrator.adapter';
 
 // Presentation
 import { UsersController } from './presentation';
@@ -30,8 +35,10 @@ import { UsersController } from './presentation';
 import {
   UserCreatedEventHandler,
   UserLoggedInEventHandler,
+  UserDeletedEventHandler,
   UserCreatedProjection,
   UserLoggedInProjection,
+  UserDeletedProjection,
 } from './infrastructure/event-bus';
 
 // Event Store Schema
@@ -46,6 +53,13 @@ const EventSchema = new Schema({
   version: { type: Number, required: true },
 });
 
+// Adicionar índices para melhorar performance
+EventSchema.index({ aggregateId: 1, version: 1 }); // Compound index para queries por aggregate e versão
+EventSchema.index({ aggregateId: 1 }); // Index para queries por aggregate
+EventSchema.index({ occurredOn: 1 }); // Index para ordenação cronológica
+EventSchema.index({ eventType: 1 }); // Index para filtros por tipo de evento
+EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggregate
+
 @Module({
   imports: [
     CqrsModule,
@@ -55,7 +69,7 @@ const EventSchema = new Schema({
       'writeConnection',
     ),
     MongooseModule.forFeature(
-      [{ name: UserSchema.name, schema: UserSchemaFactory }],
+      [{ name: UserReadSchema.name, schema: UserReadSchemaFactory }],
       'readConnection',
     ),
     MongooseModule.forFeature([{ name: 'Event', schema: EventSchema }], 'eventsConnection'),
@@ -103,11 +117,17 @@ const EventSchema = new Schema({
     },
     UserFactory,
 
+    // Application Services
+    UserRehydrationService,
+    UserRehydratorAdapter,
+
     // Event Handlers
     UserCreatedEventHandler,
     UserLoggedInEventHandler,
+    UserDeletedEventHandler,
     UserCreatedProjection,
     UserLoggedInProjection,
+    UserDeletedProjection,
   ],
   exports: [
     'UserRepository',

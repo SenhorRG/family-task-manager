@@ -5,11 +5,13 @@ import {
   MemberAddedEvent,
   MemberRemovedEvent,
   MemberRoleChangedEvent,
+  FamilyDeletedEvent,
 } from '../../domain/events';
 import { FamilyCreatedProjection } from './family-created.projection';
 import { MemberAddedProjection } from './member-added.projection';
 import { MemberRemovedProjection } from './member-removed.projection';
 import { MemberRoleChangedProjection } from './member-role-changed.projection';
+import { FamilyDeletedProjection } from './family-deleted.projection';
 
 @Injectable()
 @EventsHandler(FamilyCreatedEvent)
@@ -48,5 +50,15 @@ export class MemberRoleChangedEventHandler implements IEventHandler<MemberRoleCh
 
   async handle(event: MemberRoleChangedEvent): Promise<void> {
     await this.memberRoleChangedProjection.handle(event);
+  }
+}
+
+@Injectable()
+@EventsHandler(FamilyDeletedEvent)
+export class FamilyDeletedEventHandler implements IEventHandler<FamilyDeletedEvent> {
+  constructor(private readonly familyDeletedProjection: FamilyDeletedProjection) {}
+
+  async handle(event: FamilyDeletedEvent): Promise<void> {
+    await this.familyDeletedProjection.handle(event);
   }
 }

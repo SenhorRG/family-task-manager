@@ -26,6 +26,9 @@ import { FamilyMongoEventStore } from './infrastructure/event-store';
 // Domain Services
 import { FamilyFactory } from './domain/services';
 
+// Application Services
+import { FamilyRehydratorAdapter } from './application/services/family-rehydrator.adapter';
+
 // Schemas
 import { FamilySchema, FamilySchemaFactory } from './infrastructure/persistence/mongoose/schemas';
 import { Schema } from 'mongoose';
@@ -39,10 +42,12 @@ import {
   MemberAddedEventHandler,
   MemberRemovedEventHandler,
   MemberRoleChangedEventHandler,
+  FamilyDeletedEventHandler,
   FamilyCreatedProjection,
   MemberAddedProjection,
   MemberRemovedProjection,
   MemberRoleChangedProjection,
+  FamilyDeletedProjection,
 } from './infrastructure/event-bus';
 
 const EventSchema = new Schema({
@@ -53,6 +58,13 @@ const EventSchema = new Schema({
   occurredOn: { type: Date, required: true },
   version: { type: Number, required: true },
 });
+
+// Adicionar índices para melhorar performance
+EventSchema.index({ aggregateId: 1, version: 1 }); // Compound index para queries por aggregate e versão
+EventSchema.index({ aggregateId: 1 }); // Index para queries por aggregate
+EventSchema.index({ occurredOn: 1 }); // Index para ordenação cronológica
+EventSchema.index({ eventType: 1 }); // Index para filtros por tipo de evento
+EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggregate
 
 @Module({
   imports: [
@@ -102,15 +114,20 @@ const EventSchema = new Schema({
     },
     FamilyFactory,
 
+    // Application Services
+    FamilyRehydratorAdapter,
+
     // Event Handlers
     FamilyCreatedEventHandler,
     MemberAddedEventHandler,
     MemberRemovedEventHandler,
     MemberRoleChangedEventHandler,
+    FamilyDeletedEventHandler,
     FamilyCreatedProjection,
     MemberAddedProjection,
     MemberRemovedProjection,
     MemberRoleChangedProjection,
+    FamilyDeletedProjection,
   ],
   exports: ['FamilyRepository', 'FamilyReadRepository', 'EventStore', 'IdGenerator', FamilyFactory],
 })

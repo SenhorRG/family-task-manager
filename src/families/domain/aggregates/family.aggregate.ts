@@ -12,6 +12,7 @@ import {
   MemberAddedEvent,
   MemberRemovedEvent,
   MemberRoleChangedEvent,
+  FamilyDeletedEvent,
 } from '../events';
 
 export class Family extends BaseAggregate {
@@ -213,6 +214,15 @@ export class Family extends BaseAggregate {
     }
 
     return creator.canCreateTasksFor(target);
+  }
+
+  delete(): void {
+    this.addEvent(
+      new FamilyDeletedEvent(this._id, {
+        name: this._name.value,
+        deletedAt: new Date(),
+      }, this.version + 1),
+    );
   }
 
   protected applyEvent(event: BaseEvent): void {

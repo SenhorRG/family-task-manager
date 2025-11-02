@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MongoEventStore as BaseMongoEventStore, BaseEvent } from '../../../shared';
-import { UserCreatedEvent, UserLoggedInEvent } from '../../domain/events';
+import { UserCreatedEvent, UserLoggedInEvent, UserDeletedEvent } from '../../domain/events';
 
 export interface EventDocument {
   _id: string;
@@ -27,8 +27,15 @@ export class UserMongoEventStore extends BaseMongoEventStore {
     const eventClasses = {
       UserCreatedEvent: UserCreatedEvent,
       UserLoggedInEvent: UserLoggedInEvent,
+      UserDeletedEvent: UserDeletedEvent,
     };
 
-    return eventClasses[eventType] || BaseEvent;
+    const found = eventClasses[eventType];
+    if (!found) {
+      console.warn(`⚠️ Event class not found for eventType: "${eventType}". Available: ${Object.keys(eventClasses).join(', ')}`);
+      return BaseEvent;
+    }
+    
+    return found;
   }
 }

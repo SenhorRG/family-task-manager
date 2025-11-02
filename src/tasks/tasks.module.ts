@@ -31,6 +31,9 @@ import { TaskMongoEventStore } from './infrastructure/event-store';
 // Domain Services
 import { TaskFactory } from './domain/services';
 
+// Application Services
+import { TaskRehydratorAdapter } from './application/services/task-rehydrator.adapter';
+
 // Schemas
 import { TaskSchema, TaskSchemaFactory } from './infrastructure/persistence/mongoose/schemas';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -46,11 +49,13 @@ import {
   TaskStatusChangedEventHandler,
   TaskAssignmentAddedEventHandler,
   TaskAssignmentRemovedEventHandler,
+  TaskDeletedEventHandler,
   TaskCreatedProjection,
   TaskUpdatedProjection,
   TaskStatusChangedProjection,
   TaskAssignmentAddedProjection,
   TaskAssignmentRemovedProjection,
+  TaskDeletedProjection,
 } from './infrastructure/event-bus';
 
 const EventSchema = new Schema({
@@ -61,6 +66,13 @@ const EventSchema = new Schema({
   occurredOn: { type: Date, required: true },
   version: { type: Number, required: true },
 });
+
+// Adicionar índices para melhorar performance
+EventSchema.index({ aggregateId: 1, version: 1 }); // Compound index para queries por aggregate e versão
+EventSchema.index({ aggregateId: 1 }); // Index para queries por aggregate
+EventSchema.index({ occurredOn: 1 }); // Index para ordenação cronológica
+EventSchema.index({ eventType: 1 }); // Index para filtros por tipo de evento
+EventSchema.index({ aggregateType: 1 }); // Index para filtros por tipo de aggregate
 
 @Module({
   imports: [
@@ -113,17 +125,22 @@ const EventSchema = new Schema({
     },
     TaskFactory,
 
+    // Application Services
+    TaskRehydratorAdapter,
+
     // Event Handlers
     TaskCreatedEventHandler,
     TaskUpdatedEventHandler,
     TaskStatusChangedEventHandler,
     TaskAssignmentAddedEventHandler,
     TaskAssignmentRemovedEventHandler,
+    TaskDeletedEventHandler,
     TaskCreatedProjection,
     TaskUpdatedProjection,
     TaskStatusChangedProjection,
     TaskAssignmentAddedProjection,
     TaskAssignmentRemovedProjection,
+    TaskDeletedProjection,
   ],
   exports: ['TaskRepository', 'TaskReadRepository', 'EventStore', 'IdGenerator', TaskFactory],
 })

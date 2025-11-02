@@ -4,13 +4,13 @@ import { Model } from 'mongoose';
 import { UserReadRepository } from '../../../../application/ports';
 import { UserReadDto } from '../../../../application/dtos';
 import { UserId } from '../../../../domain';
-import { UserSchema as UserDocument } from '../schemas';
+import { UserReadSchema } from '../schemas/user-read.schema';
 
 @Injectable()
 export class MongoUserReadRepository implements UserReadRepository {
   constructor(
-    @InjectModel(UserDocument.name, 'readConnection')
-    private readonly readModel: Model<UserDocument>,
+    @InjectModel(UserReadSchema.name, 'readConnection')
+    private readonly readModel: Model<UserReadSchema>,
   ) {}
 
   async findById(id: UserId): Promise<UserReadDto | null> {

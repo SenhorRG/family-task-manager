@@ -15,6 +15,7 @@ import {
   TaskStatusChangedEvent,
   TaskAssignmentAddedEvent,
   TaskAssignmentRemovedEvent,
+  TaskDeletedEvent,
 } from '../events';
 
 export class Task extends BaseAggregate {
@@ -229,6 +230,16 @@ export class Task extends BaseAggregate {
 
   canBeEditedBy(userId: UserId): boolean {
     return this._createdBy.equals(userId);
+  }
+
+  delete(): void {
+    this.addEvent(
+      new TaskDeletedEvent(this._id, {
+        title: this._title.value,
+        familyId: this._familyId.value,
+        deletedAt: new Date(),
+      }, this.version + 1),
+    );
   }
 
   protected applyEvent(event: BaseEvent): void {

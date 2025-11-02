@@ -9,8 +9,9 @@ import {
   FamilyRole,
   FamilyRoleVO,
 } from '../value-objects';
-import { IdGenerator } from '../../../shared/domain/ports';
+import { IdGenerator, BaseEvent } from '../../../shared';
 import { UserId } from '../../../users/domain/value-objects';
+import { FamilyCreatedEvent } from '../events';
 
 @Injectable()
 export class FamilyFactory {
@@ -56,5 +57,52 @@ export class FamilyFactory {
     });
 
     return new Family(familyId, familyName, familyMembers[0], familyMembers, createdAt, updatedAt);
+  }
+
+  /**
+   * Reconstrói um Family aggregate a partir de eventos (Event Sourcing)
+   * @param aggregateId ID do aggregate
+   * @param events Lista de eventos ordenados por versão
+   * @returns Family aggregate reconstruído
+   */
+  reconstructFamilyFromEvents(aggregateId: string, events: BaseEvent[]): Family {
+    if (events.length === 0) {
+      throw new Error(`No events found for family ${aggregateId}`);
+    }
+
+    // Primeiro evento deve ser FamilyCreatedEvent
+    const firstEvent = events[0];
+    if (!(firstEvent instanceof FamilyCreatedEvent)) {
+      throw new Error(
+        `First event must be FamilyCreatedEvent, but got ${firstEvent.eventType}`,
+      );
+    }
+
+    const familyId = new FamilyId(aggregateId);
+    const familyName = new FamilyNameVO(firstEvent.eventData.name);
+    const principalUserId = new UserId(firstEvent.eventData.principalResponsibleUserId);
+    const principalRole = new FamilyRoleVO(firstEvent.eventData.principalRole as FamilyRole);
+    const principalResponsibility = new FamilyResponsibilityVO(
+      FamilyResponsibility.PRINCIPAL_RESPONSIBLE,
+    );
+    const principalMember = new FamilyMemberVO(principalUserId, principalRole, principalResponsibility);
+
+    // Criar Family sem emitir eventos (já passamos createdAt para indicar que não é novo)
+    const family = new Family(
+      familyId,
+      familyName,
+      principalMember,
+      [principalMember],
+      firstEvent.eventData.createdAt,
+      firstEvent.occurredOn,
+    );
+
+    // Carregar eventos restantes (pular o primeiro que já foi aplicado no construtor)
+    const remainingEvents = events.slice(1);
+    if (remainingEvents.length > 0) {
+      family.loadFromHistory(remainingEvents);
+    }
+
+    return family;
   }
 }

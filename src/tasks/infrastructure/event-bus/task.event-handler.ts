@@ -6,12 +6,14 @@ import {
   TaskStatusChangedEvent,
   TaskAssignmentAddedEvent,
   TaskAssignmentRemovedEvent,
+  TaskDeletedEvent,
 } from '../../domain/events';
 import { TaskCreatedProjection } from './task-created.projection';
 import { TaskUpdatedProjection } from './task-updated.projection';
 import { TaskStatusChangedProjection } from './task-status-changed.projection';
 import { TaskAssignmentAddedProjection } from './task-assignment-added.projection';
 import { TaskAssignmentRemovedProjection } from './task-assignment-removed.projection';
+import { TaskDeletedProjection } from './task-deleted.projection';
 
 @Injectable()
 @EventsHandler(TaskCreatedEvent)
@@ -62,5 +64,15 @@ export class TaskAssignmentRemovedEventHandler
 
   async handle(event: TaskAssignmentRemovedEvent): Promise<void> {
     await this.taskAssignmentRemovedProjection.handle(event);
+  }
+}
+
+@Injectable()
+@EventsHandler(TaskDeletedEvent)
+export class TaskDeletedEventHandler implements IEventHandler<TaskDeletedEvent> {
+  constructor(private readonly taskDeletedProjection: TaskDeletedProjection) {}
+
+  async handle(event: TaskDeletedEvent): Promise<void> {
+    await this.taskDeletedProjection.handle(event);
   }
 }

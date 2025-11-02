@@ -1,6 +1,6 @@
 import { BaseAggregate, BaseEvent, PasswordHasher } from '../../../shared';
 import { Password, FullName, Email, UserId } from '../value-objects';
-import { UserCreatedEvent, UserLoggedInEvent } from '../events';
+import { UserCreatedEvent, UserLoggedInEvent, UserDeletedEvent } from '../events';
 
 export class User extends BaseAggregate {
   private _fullName: FullName;
@@ -73,6 +73,16 @@ export class User extends BaseAggregate {
   changePassword(newPassword: string, passwordHasher: PasswordHasher): void {
     this._password = new Password(newPassword, passwordHasher);
     this.updateTimestamp();
+  }
+
+  delete(): void {
+    this.addEvent(
+      new UserDeletedEvent(this._id, {
+        fullName: this._fullName.value,
+        email: this._email.value,
+        deletedAt: new Date(),
+      }, this.version + 1),
+    );
   }
 
   protected applyEvent(event: BaseEvent): void {

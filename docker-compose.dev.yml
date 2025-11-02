@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MongoDB para dados principais (Write)
   mongodb-write:
@@ -8,7 +6,7 @@ services:
     environment:
       MONGO_INITDB_DATABASE: family-task-manager-write-dev
     ports:
-      - "27017:27017"
+      - "27020:27017"
     volumes:
       - mongodb_write_dev_data:/data/db
 

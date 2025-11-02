@@ -4,3 +4,4 @@ export * from './task-created.projection';
 export * from './task-status-changed.projection';
 export * from './task-updated.projection';
 export * from './task.event-handler';
+export * from './task-deleted.projection';

@@ -14,6 +14,9 @@ export class UserSchema {
   @Prop({ required: true })
   password: string;
 
+  @Prop({ required: false })
+  lastLoginAt?: Date;
+
   @Prop({ required: true, default: Date.now })
   createdAt: Date;
 
