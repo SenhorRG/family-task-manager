@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RegisterUserCommand, LoginUserCommand } from '../../application/commands';
 import { GetUserByIdQuery } from '../../application/queries';
 import { RegisterUserRequestDto, LoginUserRequestDto, AuthResponseDto } from './dto';
+import { UserReadDto } from '../../application/dtos';
 
 @Controller('users')
 export class UsersController {
@@ -38,7 +39,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<any> {
-    return this.queryBus.execute(new GetUserByIdQuery(id));
+  async getUserById(@Param('id') id: string): Promise<UserReadDto> {
+    return this.queryBus.execute<GetUserByIdQuery, UserReadDto>(new GetUserByIdQuery(id));
   }
 }

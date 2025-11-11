@@ -218,14 +218,19 @@ export class Family extends BaseAggregate {
 
   delete(): void {
     this.addEvent(
-      new FamilyDeletedEvent(this._id, {
-        name: this._name.value,
-        deletedAt: new Date(),
-      }, this.version + 1),
+      new FamilyDeletedEvent(
+        this._id,
+        {
+          name: this._name.value,
+          deletedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 
   protected applyEvent(event: BaseEvent): void {
+    void event;
     this.updateTimestamp();
   }
 }

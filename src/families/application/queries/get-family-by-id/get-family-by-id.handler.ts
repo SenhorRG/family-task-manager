@@ -3,6 +3,7 @@ import { GetFamilyByIdQuery } from './get-family-by-id.query';
 import { FamilyReadRepository } from '../../../application/ports';
 import { FamilyId } from '../../../domain/value-objects';
 import { NotFoundException, Inject } from '@nestjs/common';
+import { FamilyReadDto } from '../../dtos';
 
 @QueryHandler(GetFamilyByIdQuery)
 export class GetFamilyByIdHandler implements IQueryHandler<GetFamilyByIdQuery> {
@@ -11,7 +12,7 @@ export class GetFamilyByIdHandler implements IQueryHandler<GetFamilyByIdQuery> {
     private readonly familyReadRepository: FamilyReadRepository,
   ) {}
 
-  async execute(query: GetFamilyByIdQuery): Promise<any> {
+  async execute(query: GetFamilyByIdQuery): Promise<FamilyReadDto> {
     const { familyId } = query;
     const familyIdVO = new FamilyId(familyId);
 

@@ -4,4 +4,3 @@ export class RehydrateAggregateCommand {
     public readonly aggregateType: string,
   ) {}
 }
-

@@ -6,4 +6,3 @@ export class ReplayEventsAfterDto {
   @IsDate({ message: 'Timestamp must be a valid date' })
   timestamp: Date;
 }
-

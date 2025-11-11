@@ -3,13 +3,7 @@ import { Logger, Inject } from '@nestjs/common';
 import { ReplayAllEventsCommand } from './replay-all-events.command';
 import { EventStore } from '../../../../shared/domain/ports/event-store.port';
 import { EventBus } from '@nestjs/cqrs';
-
-interface ReplayProgress {
-  totalEvents: number;
-  processedEvents: number;
-  failedEvents: number;
-  errors: Array<{ event: any; error: Error }>;
-}
+import { ReplayEventErrorDto, ReplayEventsResponseDto, ReplayProgressDto } from '../../dtos';
 
 @CommandHandler(ReplayAllEventsCommand)
 export class ReplayAllEventsHandler implements ICommandHandler<ReplayAllEventsCommand> {
@@ -20,33 +14,32 @@ export class ReplayAllEventsHandler implements ICommandHandler<ReplayAllEventsCo
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(): Promise<any> {
+  async execute(): Promise<ReplayEventsResponseDto> {
     this.logger.log('🔄 Executando replay completo de todos os eventos...');
 
     if (!this.eventStore) {
       throw new Error('EventStore not found. Make sure it is registered in a module.');
     }
 
-    const progress: ReplayProgress = {
-      totalEvents: 0,
-      processedEvents: 0,
-      failedEvents: 0,
-      errors: [],
-    };
+    let totalEvents = 0;
+    let processedEvents = 0;
+    let failedEvents = 0;
+    const errors: ReplayEventErrorDto[] = [];
 
     try {
       const allEvents = await this.eventStore.getAllEvents();
-      progress.totalEvents = allEvents.length;
+      totalEvents = allEvents.length;
 
       this.logger.log(`Found ${allEvents.length} events to replay`);
 
       for (const event of allEvents) {
         try {
           await this.eventBus.publish(event);
-          progress.processedEvents++;
+          processedEvents++;
         } catch (error) {
-          progress.failedEvents++;
-          progress.errors.push({ event, error: error as Error });
+          failedEvents++;
+          const message = (error as Error).message ?? 'Unknown replay error';
+          errors.push(new ReplayEventErrorDto(event.aggregateId, event.eventType, message));
           this.logger.error(
             `Failed to replay event ${event.eventType} for aggregate ${event.aggregateId}: ${error.message}`,
           );
@@ -54,14 +47,16 @@ export class ReplayAllEventsHandler implements ICommandHandler<ReplayAllEventsCo
       }
 
       this.logger.log(
-        `Replay completed: ${progress.processedEvents}/${progress.totalEvents} events processed, ${progress.failedEvents} failed`,
+        `Replay completed: ${processedEvents}/${totalEvents} events processed, ${failedEvents} failed`,
       );
 
-      return {
-        success: progress.failedEvents === 0,
-        message: `Replay completed: ${progress.processedEvents}/${progress.totalEvents} events processed, ${progress.failedEvents} failed`,
+      const progress = new ReplayProgressDto(totalEvents, processedEvents, failedEvents, errors);
+
+      return new ReplayEventsResponseDto(
+        failedEvents === 0,
+        `Replay completed: ${processedEvents}/${totalEvents} events processed, ${failedEvents} failed`,
         progress,
-      };
+      );
     } catch (error) {
       this.logger.error(`Error during event replay: ${error.message}`, error.stack);
       throw error;

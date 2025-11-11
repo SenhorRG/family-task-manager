@@ -1,16 +1,13 @@
-import { BaseEvent } from '../../../shared/domain/value-objects';
+import { BaseEvent, EventPayload } from '../../../shared/domain/value-objects';
 
-export class TaskDeletedEvent extends BaseEvent {
-  constructor(
-    aggregateId: string,
-    eventData: {
-      title: string;
-      familyId: string;
-      deletedAt: Date;
-    },
-    version: number,
-  ) {
+export interface TaskDeletedEventData extends EventPayload {
+  title: string;
+  familyId: string;
+  deletedAt: Date;
+}
+
+export class TaskDeletedEvent extends BaseEvent<TaskDeletedEventData> {
+  constructor(aggregateId: string, eventData: TaskDeletedEventData, version: number) {
     super(aggregateId, 'Task', eventData, version);
   }
 }
-

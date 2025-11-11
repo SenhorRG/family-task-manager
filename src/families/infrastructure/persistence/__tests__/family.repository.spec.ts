@@ -149,11 +149,7 @@ describe('MongoFamilyRepository', () => {
 
       await repository.save(mockFamily);
 
-      expect(eventStore.saveEvents).toHaveBeenCalledWith(
-        familyId.value,
-        [mockEvent],
-        1,
-      );
+      expect(eventStore.saveEvents).toHaveBeenCalledWith(familyId.value, [mockEvent], 1);
       expect(eventBus.publish).toHaveBeenCalledWith(mockEvent);
       expect(mockFamily.markEventsAsCommitted).toHaveBeenCalled();
     });

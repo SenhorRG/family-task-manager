@@ -6,13 +6,13 @@ import { FamilyReadRepository } from '../../../../application/ports';
 import { FamilyId } from '../../../../domain/value-objects';
 import { UserId } from '../../../../../users/domain/value-objects';
 import { FamilyReadDto } from '../../../../application/dtos';
-import { FamilySchema as FamilyDocument } from '../schemas';
+import { FamilyDocument, FamilySchema } from '../schemas';
 import { GetUsersInfoQuery } from '../../../../../users/application/queries';
 
 @Injectable()
 export class MongoFamilyReadRepository implements FamilyReadRepository {
   constructor(
-    @InjectModel(FamilyDocument.name, 'readConnection')
+    @InjectModel(FamilySchema.name, 'readConnection')
     private readonly readModel: Model<FamilyDocument>,
     private readonly queryBus: QueryBus,
   ) {}
@@ -31,7 +31,7 @@ export class MongoFamilyReadRepository implements FamilyReadRepository {
     }));
 
     return new FamilyReadDto(
-      (familyDoc as any)._id.toString(),
+      familyDoc._id.toString(),
       familyDoc.name,
       enrichedMembers,
       familyDoc.createdAt,

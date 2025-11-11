@@ -62,8 +62,7 @@ export class VerifySyncHandler implements IQueryHandler<VerifySyncQuery> {
     const UserReadModel =
       this.readConnection.models.User || this.readConnection.model('User', UserSchema);
     const FamilyWriteModel =
-      this.writeConnection.models.Family ||
-      this.writeConnection.model('Family', FamilySchema);
+      this.writeConnection.models.Family || this.writeConnection.model('Family', FamilySchema);
     const FamilyReadModel =
       this.readConnection.models.Family || this.readConnection.model('Family', FamilySchema);
     const TaskWriteModel =
@@ -221,4 +220,3 @@ export class VerifySyncHandler implements IQueryHandler<VerifySyncQuery> {
     return report;
   }
 }
-

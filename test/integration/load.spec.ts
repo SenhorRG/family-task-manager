@@ -4,12 +4,15 @@ import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UserDocument } from '../../src/users/infrastructure/persistence/mongoose/schemas/user.schema';
+import { UserReadDocument } from '../../src/users/infrastructure/persistence/mongoose/schemas/user-read.schema';
+import { EventDocument } from '../../src/shared/infrastructure/event-store/mongo-event-store';
 
 describe('CQRS Load Tests', () => {
   let app: INestApplication;
-  let userWriteModel: Model<any>;
-  let userReadModel: Model<any>;
-  let eventModel: Model<any>;
+  let userWriteModel: Model<UserDocument>;
+  let userReadModel: Model<UserReadDocument>;
+  let eventModel: Model<EventDocument>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,9 +22,15 @@ describe('CQRS Load Tests', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    userWriteModel = moduleFixture.get<Model<any>>(getModelToken('User', 'writeConnection'));
-    userReadModel = moduleFixture.get<Model<any>>(getModelToken('User', 'readConnection'));
-    eventModel = moduleFixture.get<Model<any>>(getModelToken('Event', 'eventsConnection'));
+    userWriteModel = moduleFixture.get<Model<UserDocument>>(
+      getModelToken('User', 'writeConnection'),
+    );
+    userReadModel = moduleFixture.get<Model<UserReadDocument>>(
+      getModelToken('User', 'readConnection'),
+    );
+    eventModel = moduleFixture.get<Model<EventDocument>>(
+      getModelToken('Event', 'eventsConnection'),
+    );
   });
 
   beforeEach(async () => {
@@ -52,7 +61,7 @@ describe('CQRS Load Tests', () => {
 
     const responses = await Promise.all(requests);
 
-    responses.forEach((response, index) => {
+    responses.forEach((response) => {
       expect([201, 409]).toContain(response.status);
     });
 

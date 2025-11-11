@@ -19,7 +19,9 @@ export class TaskDeletedProjection {
 
       const task = await this.readModel.findById(aggregateId).exec();
       if (!task) {
-        this.logger.warn(`Task ${aggregateId} not found in read database, skipping delete projection`);
+        this.logger.warn(
+          `Task ${aggregateId} not found in read database, skipping delete projection`,
+        );
         return;
       }
 
@@ -31,4 +33,3 @@ export class TaskDeletedProjection {
     }
   }
 }
-

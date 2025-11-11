@@ -5,11 +5,7 @@ import { FamiliesModule } from './families';
 import { TasksModule } from './tasks';
 import { AdminModule } from './admin';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import {
-  DatabaseModule,
-  AppLoggerInterceptor,
-  HttpExceptionFilter,
-} from './shared';
+import { DatabaseModule, AppLoggerInterceptor, HttpExceptionFilter } from './shared';
 
 @Module({
   imports: [DatabaseModule, UsersModule, FamiliesModule, TasksModule, AdminModule],

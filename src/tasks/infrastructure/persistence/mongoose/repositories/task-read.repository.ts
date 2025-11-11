@@ -7,13 +7,13 @@ import { TaskId } from '../../../../domain/value-objects';
 import { FamilyId } from '../../../../../families/domain/value-objects';
 import { UserId } from '../../../../../users/domain/value-objects';
 import { TaskReadDto } from '../../../../application/dtos';
-import { TaskSchema as TaskDocument } from '../schemas';
+import { TaskDocument, TaskSchema } from '../schemas';
 import { GetUsersInfoQuery } from '../../../../../users/application/queries';
 
 @Injectable()
 export class MongoTaskReadRepository implements TaskReadRepository {
   constructor(
-    @InjectModel(TaskDocument.name, 'readConnection')
+    @InjectModel(TaskSchema.name, 'readConnection')
     private readonly readModel: Model<TaskDocument>,
     private readonly queryBus: QueryBus,
   ) {}
@@ -42,7 +42,7 @@ export class MongoTaskReadRepository implements TaskReadRepository {
     }));
 
     return new TaskReadDto(
-      (taskDoc as any)._id.toString(),
+      taskDoc._id.toString(),
       taskDoc.title,
       taskDoc.description,
       taskDoc.familyId,

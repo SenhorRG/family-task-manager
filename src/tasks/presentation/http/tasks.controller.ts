@@ -29,6 +29,8 @@ import {
   ChangeTaskStatusRequestDto,
   AddTaskAssignmentRequestDto,
 } from './dto';
+import { TaskReadDto } from '../../application/dtos';
+import { AuthenticatedRequest } from '../../../shared';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -41,7 +43,7 @@ export class TasksController {
   @Post()
   async createTask(
     @Body() createTaskDto: CreateTaskRequestDto,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<{ message: string }> {
     const { title, description, familyId, assignedTo, dueDate, location } = createTaskDto;
     const createdBy = req.user.sub;
@@ -67,7 +69,7 @@ export class TasksController {
   async updateTask(
     @Param('id') taskId: string,
     @Body() updateTaskDto: UpdateTaskRequestDto,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<{ message: string }> {
     const { title, description, dueDate, location } = updateTaskDto;
     const updatedBy = req.user.sub;
@@ -85,7 +87,7 @@ export class TasksController {
   async changeTaskStatus(
     @Param('id') taskId: string,
     @Body() changeStatusDto: ChangeTaskStatusRequestDto,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<{ message: string }> {
     const { status } = changeStatusDto;
     const changedBy = req.user.sub;
@@ -99,7 +101,7 @@ export class TasksController {
   async addTaskAssignment(
     @Param('id') taskId: string,
     @Body() addAssignmentDto: AddTaskAssignmentRequestDto,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<{ message: string }> {
     const { userId } = addAssignmentDto;
     const assignedBy = req.user.sub;
@@ -113,7 +115,7 @@ export class TasksController {
   async removeTaskAssignment(
     @Param('id') taskId: string,
     @Param('userId') userId: string,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<{ message: string }> {
     const removedBy = req.user.sub;
 
@@ -123,17 +125,21 @@ export class TasksController {
   }
 
   @Get(':id')
-  async getTaskById(@Param('id') id: string): Promise<any> {
-    return this.queryBus.execute(new GetTaskByIdQuery(id));
+  async getTaskById(@Param('id') id: string): Promise<TaskReadDto> {
+    return this.queryBus.execute<GetTaskByIdQuery, TaskReadDto>(new GetTaskByIdQuery(id));
   }
 
   @Get('family/:familyId')
-  async getTasksByFamily(@Param('familyId') familyId: string): Promise<any[]> {
-    return this.queryBus.execute(new GetTasksByFamilyQuery(familyId));
+  async getTasksByFamily(@Param('familyId') familyId: string): Promise<TaskReadDto[]> {
+    return this.queryBus.execute<GetTasksByFamilyQuery, TaskReadDto[]>(
+      new GetTasksByFamilyQuery(familyId),
+    );
   }
 
   @Get('user/:userId')
-  async getTasksByUser(@Param('userId') userId: string): Promise<any[]> {
-    return this.queryBus.execute(new GetTasksByUserQuery(userId));
+  async getTasksByUser(@Param('userId') userId: string): Promise<TaskReadDto[]> {
+    return this.queryBus.execute<GetTasksByUserQuery, TaskReadDto[]>(
+      new GetTasksByUserQuery(userId),
+    );
   }
 }

@@ -5,6 +5,7 @@ import { UserRehydratorAdapter } from '../../../../users/application/services';
 import { FamilyRehydratorAdapter } from '../../../../families/application/services';
 import { TaskRehydratorAdapter } from '../../../../tasks/application/services';
 import { EventStore } from '../../../../shared/domain/ports/event-store.port';
+import { RehydrateAggregateResponseDto } from '../../dtos';
 
 @CommandHandler(RehydrateAggregateCommand)
 export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggregateCommand> {
@@ -17,7 +18,7 @@ export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggre
     private readonly taskRehydrator: TaskRehydratorAdapter,
   ) {}
 
-  async execute(command: RehydrateAggregateCommand): Promise<any> {
+  async execute(command: RehydrateAggregateCommand): Promise<RehydrateAggregateResponseDto> {
     this.logger.log(
       `🔄 Executando rehydratação para ${command.aggregateType} ${command.aggregateId}...`,
     );
@@ -49,10 +50,12 @@ export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggre
         this.logger.warn(
           `${command.aggregateType} ${command.aggregateId} already exists, skipping rehydration`,
         );
-        return {
-          success: true,
-          message: `Aggregate ${command.aggregateId} already exists`,
-        };
+        return new RehydrateAggregateResponseDto(
+          true,
+          `Aggregate ${command.aggregateId} already exists`,
+          command.aggregateId,
+          command.aggregateType,
+        );
       }
 
       const events = await this.eventStore.getEvents(command.aggregateId);
@@ -73,10 +76,12 @@ export class RehydrateAggregateHandler implements ICommandHandler<RehydrateAggre
 
       this.logger.log(`✅ ${command.aggregateType} ${command.aggregateId} successfully rehydrated`);
 
-      return {
-        success: true,
-        message: `Aggregate ${command.aggregateId} rehydrated successfully`,
-      };
+      return new RehydrateAggregateResponseDto(
+        true,
+        `Aggregate ${command.aggregateId} rehydrated successfully`,
+        command.aggregateId,
+        command.aggregateType,
+      );
     } catch (error) {
       this.logger.error(
         `Error rehydrating ${command.aggregateType} ${command.aggregateId}: ${error.message}`,

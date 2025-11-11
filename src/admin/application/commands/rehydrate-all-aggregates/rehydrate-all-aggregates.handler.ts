@@ -6,14 +6,11 @@ import { FamilyRehydratorAdapter } from '../../../../families/application/servic
 import { TaskRehydratorAdapter } from '../../../../tasks/application/services';
 import { EventStore } from '../../../../shared/domain/ports/event-store.port';
 import { BaseEvent } from '../../../../shared';
-
-interface RehydrationResult {
-  aggregateType: string;
-  total: number;
-  rehydrated: number;
-  skipped: number;
-  errors: Array<{ aggregateId: string; error: string }>;
-}
+import {
+  RehydrationErrorDto,
+  RehydrationResultDto,
+  RehydrateAllAggregatesResponseDto,
+} from '../../dtos';
 
 @CommandHandler(RehydrateAllAggregatesCommand)
 export class RehydrateAllAggregatesHandler
@@ -28,7 +25,9 @@ export class RehydrateAllAggregatesHandler
     private readonly taskRehydrator: TaskRehydratorAdapter,
   ) {}
 
-  async execute(command: RehydrateAllAggregatesCommand): Promise<any> {
+  async execute(
+    command: RehydrateAllAggregatesCommand,
+  ): Promise<RehydrateAllAggregatesResponseDto> {
     if (!this.eventStore) {
       throw new Error('EventStore not found. Make sure it is registered in a module.');
     }
@@ -36,7 +35,7 @@ export class RehydrateAllAggregatesHandler
     if (!command.aggregateType) {
       this.logger.log('🔄 Executando rehydratação completa de todos os aggregates...');
 
-      const results = await Promise.all([
+      const results = await Promise.all<RehydrationResultDto>([
         this.rehydrateAllForType('User', this.userRehydrator),
         this.rehydrateAllForType('Family', this.familyRehydrator),
         this.rehydrateAllForType('Task', this.taskRehydrator),
@@ -45,11 +44,11 @@ export class RehydrateAllAggregatesHandler
       const totalRehydrated = results.reduce((sum, r) => sum + r.rehydrated, 0);
       const totalErrors = results.reduce((sum, r) => sum + r.errors.length, 0);
 
-      return {
-        success: totalErrors === 0,
-        message: `Rehydration completed: ${totalRehydrated} aggregates rehydrated, ${totalErrors} errors`,
+      return new RehydrateAllAggregatesResponseDto(
+        totalErrors === 0,
+        `Rehydration completed: ${totalRehydrated} aggregates rehydrated, ${totalErrors} errors`,
         results,
-      };
+      );
     }
 
     this.logger.log(`🔄 Executando rehydratação para tipo: ${command.aggregateType}`);
@@ -73,11 +72,11 @@ export class RehydrateAllAggregatesHandler
 
     const result = await this.rehydrateAllForType(command.aggregateType, rehydrator);
 
-    return {
-      success: result.errors.length === 0,
-      message: `Rehydration completed for ${command.aggregateType}: ${result.rehydrated}/${result.total} rehydrated, ${result.errors.length} errors`,
-      result,
-    };
+    return new RehydrateAllAggregatesResponseDto(
+      result.errors.length === 0,
+      `Rehydration completed for ${command.aggregateType}: ${result.rehydrated}/${result.total} rehydrated, ${result.errors.length} errors`,
+      [result],
+    );
   }
 
   private async rehydrateAllForType<T>(
@@ -88,16 +87,13 @@ export class RehydrateAllAggregatesHandler
       checkExists(aggregateId: string): Promise<boolean>;
       getAggregateType(): string;
     },
-  ): Promise<RehydrationResult> {
+  ): Promise<RehydrationResultDto> {
     this.logger.log(`🔄 Starting rehydration of all ${aggregateType} aggregates...`);
 
-    const result: RehydrationResult = {
-      aggregateType,
-      total: 0,
-      rehydrated: 0,
-      skipped: 0,
-      errors: [],
-    };
+    let total = 0;
+    let rehydrated = 0;
+    let skipped = 0;
+    const errors: RehydrationErrorDto[] = [];
 
     try {
       const allEvents = await this.eventStore!.getAllEvents();
@@ -114,38 +110,37 @@ export class RehydrateAllAggregatesHandler
         }
       }
 
+      const totalEventsForType = allEvents.filter((e) => e.aggregateType === aggregateType).length;
       this.logger.log(
-        `📊 Found ${eventsByAggregate.size} ${aggregateType} aggregates with ${allEvents.filter((e) => e.aggregateType === aggregateType).length} events`,
+        `📊 Found ${eventsByAggregate.size} ${aggregateType} aggregates with ${totalEventsForType} events`,
       );
-      result.total = eventsByAggregate.size;
+      total = eventsByAggregate.size;
 
       for (const [aggregateId, events] of eventsByAggregate) {
         try {
           const exists = await rehydrator.checkExists(aggregateId);
           if (exists) {
-            result.skipped++;
+            skipped++;
             continue;
           }
 
           const sortedEvents = events.sort((a, b) => a.version - b.version);
           const aggregate = await rehydrator.rehydrateAggregate(aggregateId, sortedEvents);
           await rehydrator.saveWithoutEvents(aggregate);
-          result.rehydrated++;
+          rehydrated++;
         } catch (error) {
-          result.errors.push({
-            aggregateId,
-            error: error.message,
-          });
+          const message = (error as Error).message ?? 'Unknown rehydration error';
+          errors.push(new RehydrationErrorDto(aggregateId, message));
           this.logger.error(`Error rehydrating ${aggregateType} ${aggregateId}: ${error.message}`);
         }
       }
 
       this.logger.log(
-        `✅ ${aggregateType} rehydration completed: ${result.rehydrated}/${result.total} rehydrated, ` +
-          `${result.skipped} skipped, ${result.errors.length} errors`,
+        `✅ ${aggregateType} rehydration completed: ${rehydrated}/${total} rehydrated, ` +
+          `${skipped} skipped, ${errors.length} errors`,
       );
 
-      return result;
+      return new RehydrationResultDto(aggregateType, total, rehydrated, skipped, errors);
     } catch (error) {
       this.logger.error(`Error during ${aggregateType} rehydration: ${error.message}`, error.stack);
       throw error;

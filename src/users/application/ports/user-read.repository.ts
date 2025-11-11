@@ -1,7 +1,8 @@
 import { UserId } from '../../domain';
+import { UserReadDto } from '../dtos';
 
 export interface UserReadRepository {
-  findById(id: UserId): Promise<any>;
-  findByEmail(email: string): Promise<any>;
-  findAll(): Promise<any[]>;
+  findById(id: UserId): Promise<UserReadDto | null>;
+  findByEmail(email: string): Promise<UserReadDto | null>;
+  findAll(): Promise<UserReadDto[]>;
 }

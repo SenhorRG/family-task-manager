@@ -1,16 +1,14 @@
-import { BaseEvent } from '../../../shared';
+import { BaseEvent, EventPayload } from '../../../shared';
 
-export class FamilyCreatedEvent extends BaseEvent {
-  constructor(
-    aggregateId: string,
-    eventData: {
-      name: string;
-      principalResponsibleUserId: string;
-      principalRole: string;
-      createdAt: Date;
-    },
-    version: number = 1,
-  ) {
+export interface FamilyCreatedEventData extends EventPayload {
+  name: string;
+  principalResponsibleUserId: string;
+  principalRole: string;
+  createdAt: Date;
+}
+
+export class FamilyCreatedEvent extends BaseEvent<FamilyCreatedEventData> {
+  constructor(aggregateId: string, eventData: FamilyCreatedEventData, version: number = 1) {
     super(aggregateId, 'Family', eventData, version);
   }
 }

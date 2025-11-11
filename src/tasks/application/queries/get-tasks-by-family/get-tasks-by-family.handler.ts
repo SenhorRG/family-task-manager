@@ -3,6 +3,7 @@ import { GetTasksByFamilyQuery } from './get-tasks-by-family.query';
 import { TaskReadRepository } from '../../../application/ports';
 import { FamilyId } from '../../../../families/domain/value-objects';
 import { Inject } from '@nestjs/common';
+import { TaskReadDto } from '../../dtos';
 
 @QueryHandler(GetTasksByFamilyQuery)
 export class GetTasksByFamilyHandler implements IQueryHandler<GetTasksByFamilyQuery> {
@@ -11,7 +12,7 @@ export class GetTasksByFamilyHandler implements IQueryHandler<GetTasksByFamilyQu
     private readonly taskReadRepository: TaskReadRepository,
   ) {}
 
-  async execute(query: GetTasksByFamilyQuery): Promise<any[]> {
+  async execute(query: GetTasksByFamilyQuery): Promise<TaskReadDto[]> {
     const { familyId } = query;
     const familyIdVO = new FamilyId(familyId);
 

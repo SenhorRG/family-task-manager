@@ -5,13 +5,13 @@ import { EventBus } from '@nestjs/cqrs';
 import { UserRepository } from '../../../../domain/ports';
 import { User } from '../../../../domain/aggregates';
 import { UserId, Email, Password, FullName } from '../../../../domain/value-objects';
-import { UserSchema as UserDocument } from '../schemas';
+import { UserDocument, UserSchema } from '../schemas';
 import { EventStore, PasswordHasher } from '../../../../../shared';
 
 @Injectable()
 export class MongoUserRepository implements UserRepository {
   constructor(
-    @InjectModel(UserDocument.name, 'writeConnection')
+    @InjectModel(UserSchema.name, 'writeConnection')
     private readonly writeModel: Model<UserDocument>,
     @Inject('EventStore')
     private readonly eventStore: EventStore,
@@ -90,7 +90,7 @@ export class MongoUserRepository implements UserRepository {
   }
 
   private mapToDomain(userDoc: UserDocument): User {
-    const userId = new UserId((userDoc as any)._id.toString());
+    const userId = new UserId(userDoc._id.toString());
     const userFullName = new FullName(userDoc.fullName);
     const userEmail = new Email(userDoc.email);
     const userPassword = new Password(userDoc.password, this.passwordHasher, true);

@@ -7,7 +7,6 @@ import { Family } from '../../domain/aggregates';
 import { FamilySchema } from '../../infrastructure/persistence/mongoose/schemas';
 import { AggregateRehydrator } from '../../../shared/domain/ports/aggregate-rehydrator.port';
 
-
 @Injectable()
 export class FamilyRehydratorAdapter implements AggregateRehydrator<Family> {
   constructor(

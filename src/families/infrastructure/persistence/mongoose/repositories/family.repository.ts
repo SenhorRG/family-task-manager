@@ -5,7 +5,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { FamilyRepository } from '../../../../domain/ports';
 import { Family } from '../../../../domain/aggregates';
 import { UserId } from '../../../../../users/domain/value-objects';
-import { FamilySchema as FamilyDocument } from '../schemas';
+import { FamilyDocument, FamilySchema } from '../schemas';
 import { EventStore } from '../../../../../shared';
 import {
   FamilyId,
@@ -20,7 +20,7 @@ import {
 @Injectable()
 export class MongoFamilyRepository implements FamilyRepository {
   constructor(
-    @InjectModel(FamilyDocument.name, 'writeConnection')
+    @InjectModel(FamilySchema.name, 'writeConnection')
     private readonly writeModel: Model<FamilyDocument>,
     @Inject('EventStore')
     private readonly eventStore: EventStore,
@@ -101,7 +101,7 @@ export class MongoFamilyRepository implements FamilyRepository {
   }
 
   private mapToDomain(familyDoc: FamilyDocument): Family {
-    const familyId = new FamilyId((familyDoc as any)._id.toString());
+    const familyId = new FamilyId(familyDoc._id.toString());
     const familyName = new FamilyNameVO(familyDoc.name);
 
     const familyMembers = familyDoc.members.map((member) => {

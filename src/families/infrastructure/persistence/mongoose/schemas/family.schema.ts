@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
-export type FamilyDocument = FamilySchema & Document;
+export type FamilyDocument = HydratedDocument<FamilySchema> & { _id: Types.ObjectId };
 
 @Schema({ collection: 'families' })
 export class FamilySchema {

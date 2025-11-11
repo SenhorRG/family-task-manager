@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { TaskUpdatedEvent } from '../../domain/events';
+import { TaskUpdatedEvent, TaskUpdatedEventData } from '../../domain/events';
 import { TaskSchema } from '../persistence/mongoose/schemas';
 
 @Injectable()
@@ -23,7 +23,12 @@ export class TaskUpdatedProjection {
         return;
       }
 
-      const updateData: any = {
+      const updateData: Pick<
+        TaskUpdatedEventData,
+        'title' | 'description' | 'dueDate' | 'location'
+      > & {
+        updatedAt: Date;
+      } = {
         updatedAt: eventData.updatedAt,
       };
 

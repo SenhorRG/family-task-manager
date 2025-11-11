@@ -1,15 +1,13 @@
-import { BaseEvent } from '../../../shared';
+import { BaseEvent, EventPayload } from '../../../shared';
 
-export class UserLoggedInEvent extends BaseEvent {
-  constructor(
-    aggregateId: string,
-    eventData: {
-      fullName: string;
-      email: string;
-      loggedInAt: Date;
-    },
-    version: number = 1,
-  ) {
+export interface UserLoggedInEventData extends EventPayload {
+  fullName: string;
+  email: string;
+  loggedInAt: Date;
+}
+
+export class UserLoggedInEvent extends BaseEvent<UserLoggedInEventData> {
+  constructor(aggregateId: string, eventData: UserLoggedInEventData, version: number = 1) {
     super(aggregateId, 'User', eventData, version);
   }
 }

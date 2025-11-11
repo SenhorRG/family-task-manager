@@ -77,15 +77,20 @@ export class User extends BaseAggregate {
 
   delete(): void {
     this.addEvent(
-      new UserDeletedEvent(this._id, {
-        fullName: this._fullName.value,
-        email: this._email.value,
-        deletedAt: new Date(),
-      }, this.version + 1),
+      new UserDeletedEvent(
+        this._id,
+        {
+          fullName: this._fullName.value,
+          email: this._email.value,
+          deletedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 
   protected applyEvent(event: BaseEvent): void {
+    void event;
     this.updateTimestamp();
   }
 }

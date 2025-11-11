@@ -15,13 +15,13 @@ import {
 } from '../../../../domain/value-objects';
 import { FamilyId } from '../../../../../families/domain/value-objects';
 import { UserId } from '../../../../../users/domain/value-objects';
-import { TaskSchema as TaskDocument } from '../schemas';
+import { TaskDocument, TaskSchema } from '../schemas';
 import { EventStore } from '../../../../../shared';
 
 @Injectable()
 export class MongoTaskRepository implements TaskRepository {
   constructor(
-    @InjectModel(TaskDocument.name, 'writeConnection')
+    @InjectModel(TaskSchema.name, 'writeConnection')
     private readonly writeModel: Model<TaskDocument>,
     @Inject('EventStore')
     private readonly eventStore: EventStore,
@@ -101,7 +101,7 @@ export class MongoTaskRepository implements TaskRepository {
   }
 
   private mapToDomain(taskDoc: TaskDocument): Task {
-    const taskId = new TaskId((taskDoc as any)._id.toString());
+    const taskId = new TaskId(taskDoc._id.toString());
     const taskTitle = new TaskTitleVO(taskDoc.title);
     const taskDescription = new TaskDescriptionVO(taskDoc.description);
     const taskLocation = new TaskLocationVO(taskDoc.location || '');

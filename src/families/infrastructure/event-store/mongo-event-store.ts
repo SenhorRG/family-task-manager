@@ -1,23 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { MongoEventStore as BaseMongoEventStore, BaseEvent } from '../../../shared';
+import {
+  MongoEventStore as BaseMongoEventStore,
+  EventConstructor,
+  EventDocument,
+} from '../../../shared';
 import {
   MemberRoleChangedEvent,
   MemberRemovedEvent,
   MemberAddedEvent,
   FamilyCreatedEvent,
 } from '../../domain/events';
-
-export interface EventDocument {
-  _id: string;
-  eventType: string;
-  aggregateId: string;
-  aggregateType: string;
-  eventData: any;
-  occurredOn: Date;
-  version: number;
-}
 
 @Injectable()
 export class FamilyMongoEventStore extends BaseMongoEventStore {
@@ -28,14 +22,14 @@ export class FamilyMongoEventStore extends BaseMongoEventStore {
     super(eventModel);
   }
 
-  protected getEventClass(eventType: string): any {
-    const eventClasses = {
-      FamilyCreatedEvent: FamilyCreatedEvent,
-      MemberAddedEvent: MemberAddedEvent,
-      MemberRemovedEvent: MemberRemovedEvent,
-      MemberRoleChangedEvent: MemberRoleChangedEvent,
+  protected getEventClass(eventType: string): EventConstructor | null {
+    const eventClasses: Record<string, EventConstructor> = {
+      FamilyCreatedEvent: FamilyCreatedEvent as EventConstructor,
+      MemberAddedEvent: MemberAddedEvent as EventConstructor,
+      MemberRemovedEvent: MemberRemovedEvent as EventConstructor,
+      MemberRoleChangedEvent: MemberRoleChangedEvent as EventConstructor,
     };
 
-    return eventClasses[eventType] || BaseEvent;
+    return eventClasses[eventType] || null;
   }
 }

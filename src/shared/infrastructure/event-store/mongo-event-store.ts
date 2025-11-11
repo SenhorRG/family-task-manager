@@ -1,8 +1,8 @@
-import { Injectable, Logger, ConflictException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EventStore } from '../../domain/ports/event-store.port';
-import { BaseEvent } from '../../domain/value-objects/base.event';
+import { BaseEvent, EventPayload } from '../../domain/value-objects/base.event';
 import { GenericEvent } from '../../domain/value-objects/generic.event';
 
 export interface EventDocument {
@@ -10,10 +10,16 @@ export interface EventDocument {
   eventType: string;
   aggregateId: string;
   aggregateType: string;
-  eventData: any;
+  eventData: EventPayload;
   occurredOn: Date;
   version: number;
 }
+
+export type EventConstructor = new (
+  aggregateId: string,
+  eventData: unknown,
+  version?: number,
+) => BaseEvent;
 
 export class ConcurrentModificationException extends Error {
   constructor(aggregateId: string, expectedVersion: number, actualVersion: number) {
@@ -149,5 +155,5 @@ export abstract class MongoEventStore implements EventStore {
     return event;
   }
 
-  protected abstract getEventClass(eventType: string): any;
+  protected abstract getEventClass(eventType: string): EventConstructor | null;
 }

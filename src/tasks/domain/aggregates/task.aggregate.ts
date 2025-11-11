@@ -12,6 +12,7 @@ import { UserId } from '../../../users/domain/value-objects';
 import {
   TaskCreatedEvent,
   TaskUpdatedEvent,
+  TaskUpdatedEventData,
   TaskStatusChangedEvent,
   TaskAssignmentAddedEvent,
   TaskAssignmentRemovedEvent,
@@ -126,7 +127,7 @@ export class Task extends BaseAggregate {
     updatedBy?: UserId,
   ): void {
     let hasChanges = false;
-    const changes: any = {};
+    const changes: Partial<Omit<TaskUpdatedEventData, 'updatedBy' | 'updatedAt'>> = {};
 
     if (title && title !== this._title.value) {
       this._title = new TaskTitleVO(title);
@@ -234,15 +235,20 @@ export class Task extends BaseAggregate {
 
   delete(): void {
     this.addEvent(
-      new TaskDeletedEvent(this._id, {
-        title: this._title.value,
-        familyId: this._familyId.value,
-        deletedAt: new Date(),
-      }, this.version + 1),
+      new TaskDeletedEvent(
+        this._id,
+        {
+          title: this._title.value,
+          familyId: this._familyId.value,
+          deletedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 
   protected applyEvent(event: BaseEvent): void {
+    void event;
     this.updateTimestamp();
   }
 }

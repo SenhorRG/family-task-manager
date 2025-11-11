@@ -1,12 +1,12 @@
-import { BaseEvent } from './base.event';
+import { BaseEvent, EventPayload } from './base.event';
 
-export class GenericEvent extends BaseEvent {
+export class GenericEvent<TData extends EventPayload = EventPayload> extends BaseEvent<TData> {
   private readonly _originalEventType: string;
 
   constructor(
     aggregateId: string,
     aggregateType: string,
-    eventData: any,
+    eventData: TData,
     version: number = 1,
     originalEventType?: string,
   ) {

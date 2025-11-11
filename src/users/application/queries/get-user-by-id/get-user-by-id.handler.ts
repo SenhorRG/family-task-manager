@@ -3,6 +3,7 @@ import { GetUserByIdQuery } from './get-user-by-id.query';
 import { Inject, NotFoundException } from '@nestjs/common';
 import { UserReadRepository } from '../../ports';
 import { UserId } from '../../../domain';
+import { UserReadDto } from '../../dtos';
 
 @QueryHandler(GetUserByIdQuery)
 export class GetUserByIdHandler implements IQueryHandler<GetUserByIdQuery> {
@@ -11,7 +12,7 @@ export class GetUserByIdHandler implements IQueryHandler<GetUserByIdQuery> {
     private readonly userReadRepository: UserReadRepository,
   ) {}
 
-  async execute(query: GetUserByIdQuery): Promise<any> {
+  async execute(query: GetUserByIdQuery): Promise<UserReadDto> {
     const { userId } = query;
     const userIdVO = new UserId(userId);
 

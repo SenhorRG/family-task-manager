@@ -8,6 +8,9 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
@@ -25,12 +28,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
-      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-        message = (exceptionResponse as any).message || exception.message;
-        error = (exceptionResponse as any).error || exception.name;
-      } else {
+      if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
         error = exception.name;
+      } else if (isRecord(exceptionResponse)) {
+        const responseMessage = exceptionResponse.message;
+        if (typeof responseMessage === 'string') {
+          message = responseMessage;
+        } else {
+          message = exception.message;
+        }
+        const responseError = exceptionResponse.error;
+        if (typeof responseError === 'string') {
+          error = responseError;
+        } else {
+          error = exception.name;
+        }
       }
     } else if (exception instanceof Error) {
       message = exception.message;

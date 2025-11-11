@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { User } from '../aggregates';
 import { UserId, Email, Password, FullName } from '../value-objects';
-import { IdGenerator, PasswordHasher, BaseEvent } from '../../../shared';
-import { UserCreatedEvent } from '../events';
+import { IdGenerator, PasswordHasher, BaseEvent, EventPayload } from '../../../shared';
+import { UserCreatedEvent, UserCreatedEventData } from '../events';
 
 @Injectable()
 export class UserFactory {
@@ -57,8 +57,10 @@ export class UserFactory {
     }
 
     const userId = new UserId(aggregateId);
-    const userFullName = new FullName(firstEvent.eventData.fullName);
-    const userEmail = new Email(firstEvent.eventData.email);
+    const userCreatedData = this.normalizeUserCreatedData(firstEvent);
+
+    const userFullName = new FullName(userCreatedData.fullName);
+    const userEmail = new Email(userCreatedData.email);
     const userPassword = new Password(hashedPassword, this.passwordHasher, true);
 
     const user = new User(
@@ -66,7 +68,7 @@ export class UserFactory {
       userFullName,
       userEmail,
       userPassword,
-      firstEvent.eventData.createdAt,
+      userCreatedData.createdAt,
       firstEvent.occurredOn,
     );
 
@@ -76,5 +78,41 @@ export class UserFactory {
     }
 
     return user;
+  }
+
+  private normalizeUserCreatedData(event: BaseEvent): UserCreatedEventData {
+    if (event instanceof UserCreatedEvent) {
+      return event.eventData;
+    }
+
+    const payload = event.eventData;
+    const fullName = payload.fullName;
+    const email = payload.email;
+    const createdAtRaw = payload.createdAt;
+
+    if (typeof fullName !== 'string' || fullName.trim().length === 0) {
+      throw new Error('UserCreatedEvent payload is missing a valid fullName');
+    }
+
+    if (typeof email !== 'string' || email.trim().length === 0) {
+      throw new Error('UserCreatedEvent payload is missing a valid email');
+    }
+
+    const createdAt =
+      createdAtRaw instanceof Date
+        ? createdAtRaw
+        : typeof createdAtRaw === 'string' || typeof createdAtRaw === 'number'
+          ? new Date(createdAtRaw)
+          : null;
+
+    if (!createdAt || Number.isNaN(createdAt.getTime())) {
+      throw new Error('UserCreatedEvent payload is missing a valid createdAt');
+    }
+
+    return {
+      fullName,
+      email,
+      createdAt,
+    };
   }
 }
