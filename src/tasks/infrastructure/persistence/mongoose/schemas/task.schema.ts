@@ -38,6 +38,9 @@ export class TaskSchema {
 
   @Prop({ default: Date.now })
   updatedAt: Date;
+
+  @Prop({ required: true, default: 0 })
+  version: number;
 }
 
 export const TaskSchemaFactory = SchemaFactory.createForClass(TaskSchema);

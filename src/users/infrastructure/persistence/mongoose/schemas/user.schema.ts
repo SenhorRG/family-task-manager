@@ -22,6 +22,9 @@ export class UserSchema {
 
   @Prop({ required: true, default: Date.now })
   updatedAt: Date;
+
+  @Prop({ required: true, default: 0 })
+  version: number;
 }
 
 export const UserSchemaFactory = SchemaFactory.createForClass(UserSchema);

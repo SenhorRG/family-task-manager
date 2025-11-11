@@ -21,6 +21,9 @@ export class FamilySchema {
 
   @Prop({ default: Date.now })
   updatedAt: Date;
+
+  @Prop({ required: true, default: 0 })
+  version: number;
 }
 
 export const FamilySchemaFactory = SchemaFactory.createForClass(FamilySchema);

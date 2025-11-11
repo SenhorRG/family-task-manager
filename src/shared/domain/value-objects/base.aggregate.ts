@@ -30,5 +30,9 @@ export abstract class BaseAggregate extends BaseEntity {
     });
   }
 
+  public restoreVersion(version: number): void {
+    this._version = version;
+  }
+
   protected abstract applyEvent(event: BaseEvent): void;
 }

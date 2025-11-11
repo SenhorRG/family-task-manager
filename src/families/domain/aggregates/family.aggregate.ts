@@ -48,12 +48,16 @@ export class Family extends BaseAggregate {
 
     if (!createdAt) {
       this.addEvent(
-        new FamilyCreatedEvent(this.id, {
-          name: this._name.value,
-          principalResponsibleUserId: this._principalResponsible.userId.value,
-          principalRole: this._principalResponsible.role.value,
-          createdAt: this._createdAt,
-        }),
+        new FamilyCreatedEvent(
+          this.id,
+          {
+            name: this._name.value,
+            principalResponsibleUserId: this._principalResponsible.userId.value,
+            principalRole: this._principalResponsible.role.value,
+            createdAt: this._createdAt,
+          },
+          this.version + 1,
+        ),
       );
     }
   }
@@ -108,13 +112,17 @@ export class Family extends BaseAggregate {
     this._members.push(newMember);
 
     this.addEvent(
-      new MemberAddedEvent(this._id, {
-        userId: userId.value,
-        role: role.value,
-        responsibility: responsibility.value,
-        addedBy: addedBy.value,
-        addedAt: new Date(),
-      }),
+      new MemberAddedEvent(
+        this._id,
+        {
+          userId: userId.value,
+          role: role.value,
+          responsibility: responsibility.value,
+          addedBy: addedBy.value,
+          addedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 
@@ -136,11 +144,15 @@ export class Family extends BaseAggregate {
     this._members = this._members.filter((member) => !member.userId.equals(userId));
 
     this.addEvent(
-      new MemberRemovedEvent(this._id, {
-        userId: userId.value,
-        removedBy: removedBy.value,
-        removedAt: new Date(),
-      }),
+      new MemberRemovedEvent(
+        this._id,
+        {
+          userId: userId.value,
+          removedBy: removedBy.value,
+          removedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 
@@ -185,15 +197,19 @@ export class Family extends BaseAggregate {
     }
 
     this.addEvent(
-      new MemberRoleChangedEvent(this._id, {
-        userId: userId.value,
-        oldRole: oldRole.value,
-        oldResponsibility: oldResponsibility.value,
-        newRole: newRole.value,
-        newResponsibility: newResponsibility.value,
-        changedBy: changedBy.value,
-        changedAt: new Date(),
-      }),
+      new MemberRoleChangedEvent(
+        this._id,
+        {
+          userId: userId.value,
+          oldRole: oldRole.value,
+          oldResponsibility: oldResponsibility.value,
+          newRole: newRole.value,
+          newResponsibility: newResponsibility.value,
+          changedBy: changedBy.value,
+          changedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 

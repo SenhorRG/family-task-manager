@@ -39,6 +39,7 @@ export class MongoFamilyRepository implements FamilyRepository {
       })),
       createdAt: family.createdAt,
       updatedAt: family.updatedAt,
+      version: family.version,
     };
 
     await this.writeModel.findByIdAndUpdate(family.familyId.value, familyData, {
@@ -113,7 +114,7 @@ export class MongoFamilyRepository implements FamilyRepository {
       return new FamilyMemberVO(userId, role, responsibility, member.joinedAt);
     });
 
-    return new Family(
+    const family = new Family(
       familyId,
       familyName,
       familyMembers[0],
@@ -121,5 +122,7 @@ export class MongoFamilyRepository implements FamilyRepository {
       familyDoc.createdAt,
       familyDoc.updatedAt,
     );
+    family.restoreVersion(familyDoc.version ?? 0);
+    return family;
   }
 }

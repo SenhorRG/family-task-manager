@@ -29,11 +29,15 @@ export class User extends BaseAggregate {
 
     if (!createdAt) {
       this.addEvent(
-        new UserCreatedEvent(this._id, {
-          fullName: this._fullName.value,
-          email: this._email.value,
-          createdAt: this._createdAt,
-        }),
+        new UserCreatedEvent(
+          this._id,
+          {
+            fullName: this._fullName.value,
+            email: this._email.value,
+            createdAt: this._createdAt,
+          },
+          this.version + 1,
+        ),
       );
     }
   }
@@ -59,11 +63,15 @@ export class User extends BaseAggregate {
 
     if (isValid) {
       this.addEvent(
-        new UserLoggedInEvent(this._id, {
-          fullName: this._fullName.value,
-          email: this._email.value,
-          loggedInAt: new Date(),
-        }),
+        new UserLoggedInEvent(
+          this._id,
+          {
+            fullName: this._fullName.value,
+            email: this._email.value,
+            loggedInAt: new Date(),
+          },
+          this.version + 1,
+        ),
       );
     }
 

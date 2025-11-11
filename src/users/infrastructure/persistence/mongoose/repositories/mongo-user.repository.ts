@@ -28,6 +28,7 @@ export class MongoUserRepository implements UserRepository {
       password: user.password.hashedValue,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      version: user.version,
     };
 
     try {
@@ -95,7 +96,7 @@ export class MongoUserRepository implements UserRepository {
     const userEmail = new Email(userDoc.email);
     const userPassword = new Password(userDoc.password, this.passwordHasher, true);
 
-    return new User(
+    const user = new User(
       userId,
       userFullName,
       userEmail,
@@ -103,5 +104,7 @@ export class MongoUserRepository implements UserRepository {
       userDoc.createdAt,
       userDoc.updatedAt,
     );
+    user.restoreVersion(userDoc.version ?? 0);
+    return user;
   }
 }

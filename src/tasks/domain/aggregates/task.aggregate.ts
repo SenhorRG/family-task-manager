@@ -61,16 +61,20 @@ export class Task extends BaseAggregate {
 
     if (!createdAt) {
       this.addEvent(
-        new TaskCreatedEvent(this._id, {
-          title: this._title.value,
-          description: this._description.value,
-          familyId: this._familyId.value,
-          assignedTo: this._assignments.map((a) => a.assignedTo.value),
-          assignedBy: this._createdBy.value,
-          dueDate: this._dueDate,
-          location: this._location.hasLocation() ? this._location.value : undefined,
-          createdAt: this._createdAt,
-        }),
+        new TaskCreatedEvent(
+          this._id,
+          {
+            title: this._title.value,
+            description: this._description.value,
+            familyId: this._familyId.value,
+            assignedTo: this._assignments.map((a) => a.assignedTo.value),
+            assignedBy: this._createdBy.value,
+            dueDate: this._dueDate,
+            location: this._location.hasLocation() ? this._location.value : undefined,
+            createdAt: this._createdAt,
+          },
+          this.version + 1,
+        ),
       );
     }
   }
@@ -155,11 +159,15 @@ export class Task extends BaseAggregate {
 
     if (hasChanges) {
       this.addEvent(
-        new TaskUpdatedEvent(this._id, {
-          ...changes,
-          updatedBy: updatedBy?.value || this._createdBy.value,
-          updatedAt: new Date(),
-        }),
+        new TaskUpdatedEvent(
+          this._id,
+          {
+            ...changes,
+            updatedBy: updatedBy?.value || this._createdBy.value,
+            updatedAt: new Date(),
+          },
+          this.version + 1,
+        ),
       );
     }
   }
@@ -175,12 +183,16 @@ export class Task extends BaseAggregate {
     this._status = new TaskStatusVO(newStatus.value);
 
     this.addEvent(
-      new TaskStatusChangedEvent(this._id, {
-        oldStatus,
-        newStatus: newStatus.value,
-        changedBy: changedBy.value,
-        changedAt: new Date(),
-      }),
+      new TaskStatusChangedEvent(
+        this._id,
+        {
+          oldStatus,
+          newStatus: newStatus.value,
+          changedBy: changedBy.value,
+          changedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 
@@ -193,11 +205,15 @@ export class Task extends BaseAggregate {
     this._assignments.push(assignment);
 
     this.addEvent(
-      new TaskAssignmentAddedEvent(this._id, {
-        assignedTo: assignedTo.value,
-        assignedBy: assignedBy.value,
-        assignedAt: new Date(),
-      }),
+      new TaskAssignmentAddedEvent(
+        this._id,
+        {
+          assignedTo: assignedTo.value,
+          assignedBy: assignedBy.value,
+          assignedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 
@@ -213,11 +229,15 @@ export class Task extends BaseAggregate {
     this._assignments.splice(assignmentIndex, 1);
 
     this.addEvent(
-      new TaskAssignmentRemovedEvent(this._id, {
-        assignedTo: assignedTo.value,
-        removedBy: removedBy.value,
-        removedAt: new Date(),
-      }),
+      new TaskAssignmentRemovedEvent(
+        this._id,
+        {
+          assignedTo: assignedTo.value,
+          removedBy: removedBy.value,
+          removedAt: new Date(),
+        },
+        this.version + 1,
+      ),
     );
   }
 

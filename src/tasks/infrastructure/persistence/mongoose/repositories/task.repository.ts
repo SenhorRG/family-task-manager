@@ -45,6 +45,7 @@ export class MongoTaskRepository implements TaskRepository {
       location: task.location.hasLocation() ? task.location.value : undefined,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
+      version: task.version,
     };
 
     await this.writeModel.findByIdAndUpdate(task.taskId.value, taskData, {
@@ -118,7 +119,7 @@ export class MongoTaskRepository implements TaskRepository {
         ),
     );
 
-    return new Task(
+    const task = new Task(
       taskId,
       taskTitle,
       taskDescription,
@@ -131,5 +132,7 @@ export class MongoTaskRepository implements TaskRepository {
       taskDoc.createdAt,
       taskDoc.updatedAt,
     );
+    task.restoreVersion(taskDoc.version ?? 0);
+    return task;
   }
 }
